@@ -1,0 +1,630 @@
+<!doctype html>
+<!--
+* Tabler - Premium and Open Source dashboard template with responsive and high quality UI.
+* @version 1.0.0-beta20
+* @link https://tabler.io
+* Copyright 2018-2023 The Tabler Authors
+* Copyright 2018-2023 codecalm.net Paweł Kuna
+* Licensed under MIT (https://github.com/tabler/tabler/blob/master/LICENSE)
+-->
+<html lang="en">
+
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <meta http-equiv="X-UA-Compatible" content="ie=edge" />
+  <title>设置-个人设置</title>
+
+</head>
+
+<body class="d-flex flex-column">
+  <div class="page">
+    <!-- Navbar -->
+    {{if .is_login}}
+    {{template "header-logined.html" .}}
+    {{else}}
+    {{template "header-no-login.html"}}
+    {{end}}
+
+    <header class="navbar-expand-md">
+
+    </header>
+
+    <div class="page-wrapper">
+      <!-- Page header -->
+      <div class="page-header d-print-none">
+        <div class="container-xl">
+          <div class="row g-2 align-items-center">
+            <div class="col">
+              <h2 class="page-title">
+                设置
+              </h2>
+            </div>
+          </div>
+        </div>
+      </div>
+      <!-- Page body -->
+      <div class="page-body">
+        <div class="container-xl">
+          <div class="card">
+            <div class="row g-0">
+
+              <div class="col-12 col-md-3 border-end">
+                <div class="card-body">
+                  <h4 class="subheader">账号设置</h4>
+                  <div class="list-group list-group-transparent">
+                    <a href="#" class="list-group-item list-group-item-action d-flex align-items-center active">信息设置</a>
+                    <a href="/setting-security"
+                      class="list-group-item list-group-item-action d-flex align-items-center">安全设置</a>
+                  </div>
+                  <h4 class="subheader mt-4">外部设置</h4>
+                  <div class="list-group list-group-transparent">
+
+                  </div>
+                </div>
+              </div>
+
+              <div class="col-12 col-md-9 d-flex flex-column">
+                <div class="card-body">
+                  <h2 class="mb-4">信息设置</h2>
+                  <!-- <h3 class="card-title">Profile Details</h3> -->
+                  <div class="row align-items-center">
+                    <div class="col-auto"><span id="myAvatar" class="avatar avatar-xl"
+                        style="background-image: url({{.user_info.AvatarPath}})"></span>
+                    </div>
+                    <div class="col-auto"><a href="#" class="btn" onclick="avatar_toolt.show()">
+                        更改头像
+                      </a></div>
+                    <!-- <div class="col-auto"><a href="#" class="btn btn-ghost-danger">
+                        删除头像
+                      </a></div> -->
+                  </div>
+                  <!-- <h3 class="card-title mt-4">Business Profile</h3> -->
+                  <div class="row g-3">
+                    <div class="col-md">
+                      <div class="form-label">名字</div>
+                      <input id="username" type="text" class="form-control" value="{{.user_info.Username}}" maxlength="30">
+                    </div>
+
+                    <div class="col-md">
+                      <div class="form-label">备注</div>
+                      <input id="first_name" type="text" class="form-control" value="{{.user_info.FirstName}}" maxlength="50">
+                    </div>
+                  </div>
+
+                  <div class="mb-3">
+                    <label class="form-label">生日</label>
+                    <div class="row g-2">
+                      <div class="col-5">
+                        <input type="text" class="form-control" id="birthday-picker" placeholder="选择生日"
+                          value="{{.user_info.Birthdate}}">
+                      </div>
+                    </div>
+                  </div>
+
+
+                </div>
+                
+                <div class="card-footer bg-transparent mt-auto">
+                  <div class="btn-list justify-content-end">
+                    
+                    <a href="#" onclick="updata_user_info()" class="btn btn-primary">
+                      提交
+                    </a>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+
+    {{template "footer.html"}}
+  </div>
+
+</body>
+
+</html>
+
+<div class="modal modal-blur fade" id="avata_toolt" tabindex="-1" role="dialog" aria-hidden="true">
+  <div class="modal-dialog modal-lg modal-dialog-centered" role="document">
+    <div class="modal-content">
+      <div class="container">
+        <h1>头像裁剪工具</h1>
+
+        <div class="flex-wrapper">
+          <!-- 左侧裁剪区 -->
+          <div class="crop-section">
+            <div id="image-wrapper">
+              <img id="cropper-image"
+                src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNkYAAAAAYAAjCB0C8AAAAASUVORK5CYII=">
+            </div>
+            <!-- 上传进度 -->
+            <div class="progress-container">
+              <div class="progress-bar"></div>
+            </div>
+
+            <!-- 消息提示 -->
+            <div id="message" class="alert"></div>
+
+            <div class="preview-stats">
+              <!-- <p>当前缩放: <span id="zoomValue">100%</span></p> -->
+              <p>图片尺寸: <span id="imageSize">0 x 0</span></p>
+            </div>
+          </div>
+
+          <!-- 右侧预览区 -->
+          <div class="preview-section">
+            <h3>实时预览</h3>
+            <div class="preview-box">
+              <img id="preview-img"
+                src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNkYAAAAAYAAjCB0C8AAAAASUVORK5CYII=">
+            </div>
+            
+            <!-- 控制按钮 -->
+            <div class="controls">
+              <label class="btn btn-primary">
+                📁 选择图片
+                <input type="file" id="fileInput" accept="image/*">
+              </label>
+              <button class="btn btn-secondary " onclick="rotateImage(-90)">↩️ 左旋</button>
+              <button class="btn btn-success " id="uploadBtn">✂️ 裁剪头像</button>
+
+              <button class="btn btn-danger " style="margin-top: 150px;" onclick="avatar_toolt.hide()">❌ 取消</button>
+
+
+
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+<style>
+  /* 主容器 */
+  .litepicker {
+    --color-primary: #4f46e5;
+    /* 主题色（选中日期/按钮） */
+    --color-primary-light: #e0e7ff;
+    --color-text: #1f2937;
+    /* 文本颜色 */
+    --color-text-light: #6b7280;
+    --font-family: 'Inter', sans-serif;
+    /* 自定义字体 */
+  }
+
+  /* 日期单元格悬停效果 */
+  .litepicker .container__days .day-item:hover {
+    background: #f3f4f6;
+  }
+
+  .litepicker {
+    border-radius: 8px;
+    /* 整体圆角 */
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+  }
+
+  .litepicker .container__months {
+    gap: 24px;
+    /* 月份之间的间距 */
+  }
+
+  @media (max-width: 640px) {
+    .litepicker {
+      width: 100% !important;
+      /* 全屏宽度 */
+    }
+
+    .litepicker .container__months {
+      flex-direction: column;
+      /* 垂直排列 */
+    }
+  }
+
+
+  /* 头像裁剪器样式*/
+
+  .container {
+    width: 95%; /* 改为百分比宽度 */
+    margin: 20px auto; /* 增加上下边距 */
+    max-width: 1200px; /* 保留最大宽度 */
+    background: white;
+    padding: 30px;
+    border-radius: 12px;
+    
+  }
+
+  .flex-wrapper {
+    display: flex;
+    gap: 30px;
+    margin-top: 20px;
+    flex-wrap: wrap; /* 添加换行支持 */
+  }
+
+  /* 裁剪区域 */
+  .crop-section {
+    flex: 1 1 60%; /* 弹性布局基础宽度 */
+    min-width: 300px; /* 降低最小宽度 */
+    height: auto; /* 移除固定高度 */
+    min-height: 400px; /* 设置最小高度 */
+  }
+
+  #image-wrapper {
+    width: 100%;
+    height: 60vh; /* 改用视窗单位 */
+    max-height: 600px; /* 设置最大高度 */
+    background: #f8f9fa;
+    border: 2px dashed #ddd;
+    border-radius: 8px;
+    overflow: hidden;
+  }
+  /* 预览区域自适应 */
+  .preview-section {
+    flex: 1 1 35%; /* 弹性布局基础宽度 */
+    min-width: 250px; /* 设置合理最小宽度 */
+  }
+    /* 移动端适配 */
+    @media (max-width: 768px) {
+    .container {
+      padding: 15px; /* 减少内边距 */
+    }
+
+    .flex-wrapper {
+      flex-direction: column; /* 垂直排列 */
+    }
+
+    .crop-section,
+    .preview-section {
+      width: 100% !important; /* 强制全宽 */
+      min-width: unset; /* 移除最小宽度 */
+    }
+
+    #image-wrapper {
+      height: 50vh; /* 调整移动端高度 */
+    }
+
+    .preview-box {
+      width: 120px; /* 缩小预览区域 */
+      height: 120px;
+    }
+
+    .controls {
+      flex-direction: column; /* 垂直排列按钮 */
+      margin-top: 10px;
+    }
+  }
+
+
+  #cropper-image {
+    max-width: none !important;
+    max-height: none !important;
+  }
+
+  /* 控制区域 */
+  .controls {
+    margin-top: 20px;
+    display: flex;
+    flex-direction: column;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 10px;
+  }
+
+  /* 预览区域 */
+  .preview-section {
+    flex: 1;
+    min-width: 50px;
+  }
+
+  .preview-box {
+    width: 150px;
+    height: 150px;
+    /* border-radius: 50%; */
+    border: 3px solid var(--primary-color);
+    overflow: hidden;
+    margin: 0 auto 20px;
+  }
+
+  #preview-img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+
+
+
+  /* 上传进度 */
+  .progress-container {
+    height: 8px;
+    background: #eee;
+    border-radius: 4px;
+    margin-top: 20px;
+    overflow: hidden;
+    display: none;
+  }
+
+  .progress-bar {
+    width: 0%;
+    height: 100%;
+    background: var(--primary-color);
+    transition: width 0.3s ease;
+  }
+
+  /* 消息提示 */
+  .alert {
+    padding: 15px;
+    border-radius: 6px;
+    margin-top: 20px;
+    display: none;
+  }
+
+  .alert-success {
+    background: #dff0d8;
+    color: #3c763d;
+  }
+
+  .alert-error {
+    background: #f2dede;
+    color: var(--error-color);
+  }
+
+  input[type="file"] {
+    display: none;
+  }
+</style>
+
+<!-- lib -->
+
+<!-- 依赖库 -->
+<!-- 引入 Litepicker 核心 CSS 和 JS -->
+
+<script src="/dist/libs/litepicker/dist/js/litepicker.js"></script>
+
+<script src="/dist/libs/cropper/cropper.min.js"></script>
+
+<link href="/dist/libs/cropper/cropper.min.css" rel="stylesheet">
+
+<!-- libs -->
+<script src="/dist/libs/bootstrap/dist/js/bootstrap.min.js"></script>
+
+
+<script>
+
+  const avatar_dom = document.getElementById('myAvatar');
+  function get_user_avatar() {
+
+    const bgImage = avatar_dom.style.backgroundImage;
+    // 方法 2：字符串分割
+    const currentUrl = bgImage.split('url("')[1]?.split('")')[0];
+    return currentUrl;
+  }
+
+  function set_user_avatar(str) {
+    avatar_dom.style.backgroundImage = 'url("' + str + '")';
+  }
+
+  //头像裁剪工具
+  const avatar_toolt = new bootstrap.Modal('#avata_toolt');
+
+  const birthdayPicker = new Litepicker({
+    element: document.getElementById('birthday-picker'),
+    lang: 'zh-cn', // 设置为中文
+    firstDay: 0, // 周日为首日
+    format: 'YYYY-MM-DD', // 日期格式
+    maxDate: new Date(),  // 最大日期为今天
+    dropdowns: {
+      minYear: 1900,      // 最小可选年份
+      maxYear: new Date().getFullYear(), // 最大为当前年份
+      months: true,       // 显示月份下拉
+      years: true         // 显示年份下拉
+    }
+  });
+
+
+  //头像裁剪区
+  let cropper;
+  const image = document.getElementById('cropper-image');
+  const message = document.getElementById('message');
+  let currentScale = 1;
+
+  // 初始化Cropper
+  function initCropper(imageSrc) {
+    if (cropper) {
+      cropper.destroy();
+    }
+
+    image.src = imageSrc;
+    cropper = new Cropper(image, {
+      aspectRatio: 1,
+      viewMode: 2,
+      autoCropArea: 0.8,
+      zoomable: true,
+      zoomOnWheel: true,
+      zoomOnTouch: true,
+      wheelZoomRatio: 0.1,
+      //minCanvasWidth: 400,
+      //minCanvasHeight: 400,
+      crop: updatePreview,
+      ready() {
+        updateImageInfo();
+        document.querySelector('.progress-container').style.display = 'none';
+      }
+    });
+  }
+
+
+
+  // 旋转控制
+  function rotateImage(degrees) {
+    if (cropper) {
+      cropper.rotateTo(cropper.getData().rotate + degrees);
+      updatePreview();
+    }
+  }
+
+  // 更新预览
+  function updatePreview() {
+    const canvas = cropper.getCroppedCanvas({
+      width: 250,
+      height: 250,
+      imageSmoothingQuality: 'high'
+    });
+
+    if (canvas) {
+      canvas.toBlob(blob => {
+        const previewUrl = URL.createObjectURL(blob);
+        document.getElementById('preview-img').src = previewUrl;
+        // 清理旧URL
+        setTimeout(() => URL.revokeObjectURL(previewUrl), 1000);
+      }, 'image/jpeg', 0.85);
+      updateImageInfo();
+    }
+  }
+
+  // 更新图片信息
+  function updateImageInfo() {
+    if (cropper) {
+      const data = cropper.getData();
+      // document.getElementById('zoomValue').textContent = 
+      //     `${Math.round(currentScale * 100)}%`;
+      document.getElementById('imageSize').textContent =
+        `${Math.round(data.width)} x ${Math.round(data.height)}`;
+    }
+  }
+
+  // 文件选择事件
+  document.getElementById('fileInput').addEventListener('change', function (e) {
+    const file = e.target.files[0];
+    if (!file) return;
+
+    if (!file.type.startsWith('image/')) {
+      showMessage('⚠️ 请选择有效的图片文件', 'error');
+      return;
+    }
+
+    const reader = new FileReader();
+    reader.onload = () => {
+      initCropper(reader.result);
+      currentScale = 1;
+    };
+    reader.readAsDataURL(file);
+  });
+
+  // 上传功能
+  document.getElementById('uploadBtn').addEventListener('click', async () => {
+    const progressBar = document.querySelector('.progress-bar');
+    const progressContainer = document.querySelector('.progress-container');
+
+    try {
+      if (!cropper) {
+        showMessage('⚠️ 请先选择并裁剪图片', 'error');
+        return;
+      }
+
+      progressContainer.style.display = 'block';
+      const canvas = cropper.getCroppedCanvas({
+        width: 1024,
+        height: 1024,
+        imageSmoothingQuality: 'high'
+      });
+
+      const blob = await new Promise(resolve =>
+        canvas.toBlob(resolve, 'image/jpeg', 0.9)
+      );
+
+      const formData = new FormData();
+      formData.append('file', blob, `avatar_${Date.now()}.jpg`);
+      formData.append('meta', JSON.stringify({
+        width: canvas.width,
+        height: canvas.height,
+        scale: currentScale.toFixed(2)
+      }));
+
+      const response = await fetch('/api/v1/file/avatar', {
+        method: 'POST',
+        body: formData,
+        headers: {
+          'X-Requested-With': 'XMLHttpRequest'
+        }
+      });
+
+      if (!response.ok) throw new Error(`服务器错误: ${response.status}`);
+
+      const result = await response.json();
+      if (result.err_code == 0) {
+        showMessage(`✅ 上传成功!`, 'success');
+        set_user_avatar(result.data.path);
+        console.log(get_user_avatar());
+        avatar_toolt.hide();
+      } else {
+        showMessage(`❌ 上传失败: ${result.err_msg}`, 'error');
+      }
+
+
+    } catch (error) {
+      console.error('上传错误:', error);
+      showMessage(`❌ 上传失败: ${error.message}`, 'error');
+    } finally {
+      progressBar.style.width = '0%';
+      progressContainer.style.display = 'none';
+    }
+  });
+
+  // 消息提示
+  function showMessage(text, type = 'success') {
+    message.className = `alert alert-${type}`;
+    message.textContent = text;
+    message.style.display = 'block';
+    setTimeout(() => message.style.display = 'none', 5000);
+  }
+
+  // 清理资源
+  window.addEventListener('beforeunload', () => {
+    if (cropper) cropper.destroy();
+    document.querySelectorAll('img').forEach(img => {
+      if (img.src.startsWith('blob:')) URL.revokeObjectURL(img.src);
+    });
+  });
+
+  // 初始化默认图片
+  //initCropper('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNkYAAAAAYAAjCB0C8AAAAASUVORK5CYII=');
+
+  //更新用户资料
+  function updata_user_info(){
+    const url = '/api/v1/user/updata_info';
+      const sumt_data = {
+        avatar:get_user_avatar(),
+        username:document.getElementById("username").value,
+        first_name:document.getElementById("first_name").value,
+        birthday:document.getElementById("birthday-picker").value,
+        
+
+      };
+      try {
+        const response = axios.post(url, sumt_data, {
+          headers: {
+            'Content-Type': 'application/json'
+          }
+        }).then(response => {
+          //console.log(response)
+          if(response.data.err_code==0){
+            location.reload()
+          }else{
+            console.log(response.data)
+          }
+          
+        });
+      } catch (error) {
+        if (error.response) {
+          // 服务器返回了错误状态码（如 4xx, 5xx）
+          console.error('服务器错误:', error.response.data);
+        } else {
+          console.error('请求未完成:', error.message);
+        }
+      }
+  }
+</script>

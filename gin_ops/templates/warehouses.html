@@ -1,0 +1,268 @@
+<!doctype html>
+<!--
+* Tabler - Premium and Open Source dashboard template with responsive and high quality UI.
+* @version 1.0.0-beta20
+* @link https://tabler.io
+* Copyright 2018-2023 The Tabler Authors
+* Copyright 2018-2023 codecalm.net Paweł Kuna
+* Licensed under MIT (https://github.com/tabler/tabler/blob/master/LICENSE)
+-->
+<html lang="en">
+
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <meta http-equiv="X-UA-Compatible" content="ie=edge" />
+  <title>仓库</title>
+
+</head>
+
+<body class="d-flex flex-column">
+  <div class="page">
+
+    {{if .is_login}}
+    {{template "header-logined.html" .}}
+    {{else}}
+    {{template "header-no-login.html"}}
+    {{end}}
+
+    {{template "header-navigation.html"}}
+
+
+    <div class="page-wrapper">
+      <!-- Page header -->
+      <div class="page-header d-print-none">
+        <div class="container-xl">
+          <div class="row g-2 align-items-center">
+            <div class="col">
+              <h2 class="page-title">
+                所有仓库
+              </h2>
+              <div class="text-secondary mt-1">第{{.this_page}}页-共{{.total_pages}}页</div>
+            </div>
+            <!-- Page title actions -->
+            <div class="col-auto ms-auto d-print-none">
+              <div class="d-flex">
+                <input type="search" class="form-control d-inline-block w-9 me-3" placeholder="搜索仓库">
+                <a href="#" class="btn btn-primary" onclick="new_warehouses_windows_dom.show()">
+                  <!-- Download SVG icon from http://tabler-icons.io/i/plus -->
+                  <svg xmlns="http://www.w3.org/2000/svg" class="icon" width="24" height="24" viewBox="0 0 24 24"
+                    stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+                    <path stroke="none" d="M0 0h24v24H0z" fill="none"></path>
+                    <path d="M12 5l0 14"></path>
+                    <path d="M5 12l14 0"></path>
+                  </svg>
+                  创建新仓库
+                </a>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <!-- Page body -->
+      <div class="page-body">
+        <div class="container-xl">
+          <div class="row row-cards">
+
+            {{range .Warehouses}}
+
+            <div class="col-md-6 col-lg-3">
+              <div class="card h-100">
+                <div class="card-body p-4 text-center">
+                  <span class="avatar avatar-xl mb-3 rounded">仓库{{.ID}}</span>
+                  <h3 class="m-0 mb-1"><a href="/warehouse/{{.ID}}">{{.Name}}</a></h3>
+                  <div class="text-secondary">{{.Info}}</div>
+
+                </div>
+                <div class="d-flex">
+                  <div class="card-btn">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"
+                      stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+                      class="icon icon-tabler icons-tabler-outline icon-tabler-box">
+                      <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+                      <path d="M12 3l8 4.5l0 9l-8 4.5l-8 -4.5l0 -9l8 -4.5" />
+                      <path d="M12 12l8 -4.5" />
+                      <path d="M12 12l0 9" />
+                      <path d="M12 12l-8 -4.5" />
+                    </svg>
+                    {{.UsedCapacity}}
+                  </div>
+                  <a href="/warehouse/{{.ID}}" class="card-btn"><!-- Download SVG icon from http://tabler-icons.io/i/phone -->
+                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"
+                      stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+                      class="icon icon-tabler icons-tabler-outline icon-tabler-binoculars">
+                      <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+                      <path d="M7 16m-3 0a3 3 0 1 0 6 0a3 3 0 1 0 -6 0" />
+                      <path d="M17 16m-3 0a3 3 0 1 0 6 0a3 3 0 1 0 -6 0" />
+                      <path d="M16.346 9.17l-.729 -1.261c-.16 -.248 -1.056 -.203 -1.117 .091l-.177 1.38" />
+                      <path
+                        d="M19.761 14.813l-2.84 -5.133c-.189 -.31 -.592 -.68 -1.421 -.68c-.828 0 -1.5 .448 -1.5 1v6" />
+                      <path d="M7.654 9.17l.729 -1.261c.16 -.249 1.056 -.203 1.117 .091l.177 1.38" />
+                      <path d="M4.239 14.813l2.84 -5.133c.189 -.31 .592 -.68 1.421 -.68c.828 0 1.5 .448 1.5 1v6" />
+                      <rect width="4" height="2" x="10" y="12" />
+                    </svg>
+                    查看</a>
+                </div>
+              </div>
+            </div>
+            {{end}}
+
+
+
+
+
+
+
+
+
+
+
+
+          </div>
+
+          <div class="d-flex mt-4">
+            <ul class="pagination ms-auto">
+              <li class="page-item {{if .disabled_prev_page}}disabled{{end}}">
+                <a class="page-link" href="{{.prev_page}}">
+                  <!-- Download SVG icon from http://tabler-icons.io/i/chevron-left -->
+                  <svg xmlns="http://www.w3.org/2000/svg" class="icon" width="24" height="24" viewBox="0 0 24 24"
+                    stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+                    <path stroke="none" d="M0 0h24v24H0z" fill="none"></path>
+                    <path d="M15 6l-6 6l6 6"></path>
+                  </svg>
+                  上一页
+                </a>
+              </li>
+
+
+              {{range .page_range}}
+                <li class="page-item {{.active}}"><a class="page-link" href="{{.page_href}} ">{{.page}} </a></li>
+              {{end}}
+
+              <li class="page-item {{if .disabled_next_page}}disabled{{end}}">
+                <a class="page-link" href="{{.next_page}}">
+                  下一页 <!-- Download SVG icon from http://tabler-icons.io/i/chevron-right -->
+                  <svg xmlns="http://www.w3.org/2000/svg" class="icon" width="24" height="24" viewBox="0 0 24 24"
+                    stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+                    <path stroke="none" d="M0 0h24v24H0z" fill="none"></path>
+                    <path d="M9 6l6 6l-6 6"></path>
+                  </svg>
+                </a>
+              </li>
+            </ul>
+          </div>
+
+        </div>
+      </div>
+
+    </div>
+
+
+    {{template "footer.html"}}
+
+
+  </div>
+</body>
+
+</html>
+
+<!-- 弹出内容 -->
+<div class="modal modal-blur fade" id="new_warehouses_windows" tabindex="-1" role="dialog" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">创建新仓库</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <div class="row mb-3 align-items-end">
+          <div class="col-auto">
+            <a href="#" class="avatar avatar-upload rounded">
+              <!-- Download SVG icon from http://tabler-icons.io/i/plus -->
+              <svg xmlns="http://www.w3.org/2000/svg" class="icon" width="24" height="24" viewBox="0 0 24 24"
+                stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+                <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+                <path d="M12 5l0 14" />
+                <path d="M5 12l14 0" />
+              </svg>
+              <span class="avatar-upload-text">添加图片</span>
+            </a>
+          </div>
+          <div class="col">
+            <label class="form-label">仓库名*</label>
+            <input type="text" class="form-control" id="wh_name" />
+          </div>
+        </div>
+
+        <div>
+          <label class="form-label">仓库说明</label>
+          <textarea class="form-control" id="wh_info"></textarea>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn me-auto" data-bs-dismiss="modal">取消</button>
+        <button type="button" class="btn btn-primary" onclick="creat_ware_houses_post()">创建</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- libs -->
+<script src="/dist/libs/bootstrap/dist/js/bootstrap.min.js"></script>
+
+<script>
+  //新建仓库窗口
+  const new_warehouses_windows_dom = new bootstrap.Modal('#new_warehouses_windows');
+
+  function creat_ware_houses_post() {
+
+    var data_chack = false;
+    //检测数据合法性
+    if ($("#wh_name").val() == "") {
+      //console.log("no");
+      data_chack = false;
+    } else {
+      data_chack = true;
+    }
+
+    //数据合法，推送
+    if (data_chack) {
+      const url = '/api/v1/warehouses_api/create';
+      const sumt_data = {
+        warehouses_name: $("#wh_name").val(),
+        warehouses_info: $("#wh_info").val()
+
+      };
+
+      try {
+        const response = axios.post(url, sumt_data, {
+          headers: {
+            'Content-Type': 'application/json'
+          }
+        }).then(response => {
+          console.log('提交成功:', response.data); // 正确打印服务器数据
+          //跳转到主页
+          if (response.data.err_code == 0) {
+            new_warehouses_windows_dom.hide();
+            location.reload();
+          }
+
+
+
+        });
+      } catch (error) {
+        if (error.response) {
+          // 服务器返回了错误状态码（如 4xx, 5xx）
+          console.error('服务器错误:', error.response.data);
+        } else {
+          console.error('请求未完成:', error.message);
+        }
+      }
+    }
+
+
+
+
+
+  }
+</script>

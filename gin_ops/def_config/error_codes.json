@@ -1,0 +1,20 @@
+{
+    "api_ok":0,
+    "user_name_dup":1,
+    "user_name_nofind":2,
+    "user_password_err":3,
+    "user_api_error":4,
+    "user_no_sign":5,
+    "file_save_err":6,
+    "file_type_err":7,
+    "file_get_err":8,
+    "file_size_err":9,
+    "file_mime_err":10,
+    "json_error":11,
+    "gin_error":12,
+    "path_error":13,
+    "email_error":14,
+    "warehouses_api_err":15,
+    "warehouses_name_err":16,
+    "warehouses_id_err":17
+}

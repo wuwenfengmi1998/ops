@@ -1,0 +1,372 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>头像裁剪上传系统 - 完整版</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.12/cropper.min.css" rel="stylesheet">
+    <style>
+        :root {
+            --primary-color: #2196F3;
+            --error-color: #f44336;
+        }
+
+        body {
+            font-family: 'Segoe UI', sans-serif;
+            background: #f5f5f5;
+            margin: 0;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            padding: 30px;
+            border-radius: 12px;
+            box-shadow: 0 2px 15px rgba(0, 0, 0, 0.1);
+        }
+
+        .flex-wrapper {
+            display: flex;
+            gap: 30px;
+            margin-top: 20px;
+        }
+
+        /* 裁剪区域 */
+        .crop-section {
+            flex: 2;
+            min-width: 500px;
+        }
+
+        #image-wrapper {
+            width: 100%;
+            height: 500px;
+            background: #f8f9fa;
+            border: 2px dashed #ddd;
+            border-radius: 8px;
+            overflow: hidden;
+        }
+
+        #cropper-image {
+            max-width: none !important;
+            max-height: none !important;
+        }
+
+        /* 控制区域 */
+        .controls {
+            margin-top: 20px;
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 10px;
+        }
+
+        /* 预览区域 */
+        .preview-section {
+            flex: 1;
+            min-width: 300px;
+        }
+
+        .preview-box {
+            width: 250px;
+            height: 250px;
+            border-radius: 50%;
+            border: 3px solid var(--primary-color);
+            overflow: hidden;
+            margin: 0 auto 20px;
+        }
+
+        #preview-img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        /* 按钮样式 */
+        .btn {
+            padding: 12px 20px;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .btn-primary {
+            background: var(--primary-color);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: #1976D2;
+        }
+
+        .btn-zoom {
+            background: #4CAF50;
+        }
+
+        /* 上传进度 */
+        .progress-container {
+            height: 8px;
+            background: #eee;
+            border-radius: 4px;
+            margin-top: 20px;
+            overflow: hidden;
+            display: none;
+        }
+
+        .progress-bar {
+            width: 0%;
+            height: 100%;
+            background: var(--primary-color);
+            transition: width 0.3s ease;
+        }
+
+        /* 消息提示 */
+        .alert {
+            padding: 15px;
+            border-radius: 6px;
+            margin-top: 20px;
+            display: none;
+        }
+
+        .alert-success {
+            background: #dff0d8;
+            color: #3c763d;
+        }
+
+        .alert-error {
+            background: #f2dede;
+            color: var(--error-color);
+        }
+
+        input[type="file"] {
+            display: none;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <h1>专业头像裁剪系统</h1>
+
+        <div class="flex-wrapper">
+            <!-- 左侧裁剪区 -->
+            <div class="crop-section">
+                <div id="image-wrapper">
+                    <img id="cropper-image"
+                        src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNkYAAAAAYAAjCB0C8AAAAASUVORK5CYII=">
+                </div>
+
+                <!-- 控制按钮 -->
+                <div class="controls">
+                    <label class="btn btn-primary">
+                        📁 选择图片
+                        <input type="file" id="fileInput" accept="image/*">
+                    </label>
+                    <button class="btn btn-primary" id="uploadBtn">🚀 上传头像</button>
+                    <button class="btn btn-primary" id="resetBtn">🔄 重置</button>
+                    <button class="btn btn-zoom" onclick="zoomControl(0.2)">➕ 放大</button>
+                    <button class="btn btn-zoom" onclick="zoomControl(-0.2)">➖ 缩小</button>
+                    <button class="btn btn-primary" onclick="rotateImage(-90)">↩️ 左旋</button>
+                </div>
+
+                <!-- 上传进度 -->
+                <div class="progress-container">
+                    <div class="progress-bar"></div>
+                </div>
+
+                <!-- 消息提示 -->
+                <div id="message" class="alert"></div>
+            </div>
+
+            <!-- 右侧预览区 -->
+            <div class="preview-section">
+                <h3>实时预览 (250x250px)</h3>
+                <div class="preview-box">
+                    <img id="preview-img"
+                        src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNkYAAAAAYAAjCB0C8AAAAASUVORK5CYII=">
+                </div>
+                <div class="preview-stats">
+                    <p>当前缩放: <span id="zoomValue">100%</span></p>
+                    <p>图片尺寸: <span id="imageSize">0 x 0</span></p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 依赖库 -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.12/cropper.min.js"></script>
+
+    <script>
+        let cropper;
+        const image = document.getElementById('cropper-image');
+        const message = document.getElementById('message');
+        let currentScale = 1;
+
+        // 初始化Cropper
+        function initCropper(imageSrc) {
+            if (cropper) {
+                cropper.destroy();
+            }
+
+            image.src = imageSrc;
+            cropper = new Cropper(image, {
+                aspectRatio: 1,
+                viewMode: 2,
+                autoCropArea: 0.8,
+                zoomable: true,
+                zoomOnWheel: true,
+                zoomOnTouch: true,
+                wheelZoomRatio: 0.1,
+                minCanvasWidth: 400,
+                minCanvasHeight: 400,
+                crop: updatePreview,
+                ready() {
+                    updateImageInfo();
+                    document.querySelector('.progress-container').style.display = 'none';
+                }
+            });
+        }
+
+        // 缩放控制
+        function zoomControl(ratio) {
+            if (!cropper) return;
+
+            currentScale = Math.min(Math.max(0.5, currentScale + ratio), 3);
+            cropper.zoomTo(currentScale);
+            updateImageInfo();
+        }
+
+        // 旋转控制
+        function rotateImage(degrees) {
+            if (cropper) {
+                cropper.rotateTo(cropper.getData().rotate + degrees);
+                updatePreview();
+            }
+        }
+
+        // 更新预览
+        function updatePreview() {
+            const canvas = cropper.getCroppedCanvas({
+                width: 250,
+                height: 250,
+                imageSmoothingQuality: 'high'
+            });
+
+            if (canvas) {
+                canvas.toBlob(blob => {
+                    const previewUrl = URL.createObjectURL(blob);
+                    document.getElementById('preview-img').src = previewUrl;
+                    // 清理旧URL
+                    setTimeout(() => URL.revokeObjectURL(previewUrl), 1000);
+                }, 'image/jpeg', 0.85);
+            }
+        }
+
+        // 更新图片信息
+        function updateImageInfo() {
+            if (cropper) {
+                const data = cropper.getData();
+                document.getElementById('zoomValue').textContent =
+                    `${Math.round(currentScale * 100)}%`;
+                document.getElementById('imageSize').textContent =
+                    `${Math.round(data.width)} x ${Math.round(data.height)}`;
+            }
+        }
+
+        // 文件选择事件
+        document.getElementById('fileInput').addEventListener('change', function (e) {
+            const file = e.target.files[0];
+            if (!file) return;
+
+            if (!file.type.startsWith('image/')) {
+                showMessage('⚠️ 请选择有效的图片文件', 'error');
+                return;
+            }
+
+            const reader = new FileReader();
+            reader.onload = () => {
+                initCropper(reader.result);
+                currentScale = 1;
+            };
+            reader.readAsDataURL(file);
+        });
+
+        // 上传功能
+        document.getElementById('uploadBtn').addEventListener('click', async () => {
+            const progressBar = document.querySelector('.progress-bar');
+            const progressContainer = document.querySelector('.progress-container');
+
+            try {
+                if (!cropper) {
+                    showMessage('⚠️ 请先选择并裁剪图片', 'error');
+                    return;
+                }
+
+                progressContainer.style.display = 'block';
+                const canvas = cropper.getCroppedCanvas({
+                    width: 1024,
+                    height: 1024,
+                    imageSmoothingQuality: 'high'
+                });
+
+                const blob = await new Promise(resolve =>
+                    canvas.toBlob(resolve, 'image/jpeg', 0.9)
+                );
+
+                const formData = new FormData();
+                formData.append('file', blob, `avatar_${Date.now()}.jpg`);
+                formData.append('meta', JSON.stringify({
+                    width: canvas.width,
+                    height: canvas.height,
+                    scale: currentScale.toFixed(2)
+                }));
+
+                const response = await fetch('/api/v1/file/upload', {
+                    method: 'POST',
+                    body: formData,
+                    headers: {
+                        'X-Requested-With': 'XMLHttpRequest'
+                    }
+                });
+
+                if (!response.ok) throw new Error(`服务器错误: ${response.status}`);
+
+                const result = await response.json();
+                showMessage(`✅ 上传成功！路径: ${result.path}`, 'success');
+
+            } catch (error) {
+                console.error('上传错误:', error);
+                showMessage(`❌ 上传失败: ${error.message}`, 'error');
+            } finally {
+                progressBar.style.width = '0%';
+                progressContainer.style.display = 'none';
+            }
+        });
+
+        // 消息提示
+        function showMessage(text, type = 'success') {
+            message.className = `alert alert-${type}`;
+            message.textContent = text;
+            message.style.display = 'block';
+            setTimeout(() => message.style.display = 'none', 5000);
+        }
+
+        // 清理资源
+        window.addEventListener('beforeunload', () => {
+            if (cropper) cropper.destroy();
+            document.querySelectorAll('img').forEach(img => {
+                if (img.src.startsWith('blob:')) URL.revokeObjectURL(img.src);
+            });
+        });
+
+        // 初始化默认图片
+        initCropper('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNkYAAAAAYAAjCB0C8AAAAASUVORK5CYII=');
+    </script>
+</body>
+
+</html>

@@ -1,0 +1,295 @@
+<!doctype html>
+<!--
+* Tabler - Premium and Open Source dashboard template with responsive and high quality UI.
+* @version 1.0.0-beta20
+* @link https://tabler.io
+* Copyright 2018-2023 The Tabler Authors
+* Copyright 2018-2023 codecalm.net Paweł Kuna
+* Licensed under MIT (https://github.com/tabler/tabler/blob/master/LICENSE)
+-->
+<html lang="en">
+
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+    <meta http-equiv="X-UA-Compatible" content="ie=edge" />
+    <title>仓库-{{.warehouse_id}}</title>
+
+</head>
+
+<body class="d-flex flex-column">
+    <div class="page">
+
+        {{if .is_login}}
+        {{template "header-logined.html" .}}
+        {{else}}
+        {{template "header-no-login.html"}}
+        {{end}}
+
+        {{template "header-navigation.html"}}
+
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header">
+                    <h3 class="card-title">物件清单</h3>
+                </div>
+                <div class="card-body border-bottom py-3">
+                    <div class="d-flex">
+                        <div class="text-secondary">
+                            显示
+                            <div class="mx-2 d-inline-block">
+                                <input type="text" class="form-control form-control-sm" value="8" size="3"
+                                    aria-label="Invoices count">
+                            </div>
+                            个物件
+                        </div>
+                        <div class="ms-auto text-secondary d-flex">
+                            <input type="search" class="form-control d-inline-block w-9 me-3" placeholder="搜索物件">
+                            <a href="#" class="btn btn-primary" onclick="new_warehouses_item_windows_dom.show()">
+                                <!-- Download SVG icon from http://tabler-icons.io/i/plus -->
+                                <svg xmlns="http://www.w3.org/2000/svg" class="icon" width="24" height="24"
+                                    viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none"
+                                    stroke-linecap="round" stroke-linejoin="round">
+                                    <path stroke="none" d="M0 0h24v24H0z" fill="none"></path>
+                                    <path d="M12 5l0 14"></path>
+                                    <path d="M5 12l14 0"></path>
+                                </svg>
+                                添加物件
+                            </a>
+                        </div>
+                    </div>
+                </div>
+                <div class="table-responsive">
+                    <table class="table card-table table-vcenter text-nowrap datatable">
+                        <thead>
+                            <tr>
+                                <th class="w-1"><input class="form-check-input m-0 align-middle" type="checkbox"
+                                        aria-label="Select all invoices"></th>
+                                <th class="w-1">ID. <!-- Download SVG icon from http://tabler-icons.io/i/chevron-up -->
+                                    <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-sm icon-thick" width="24"
+                                        height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"
+                                        fill="none" stroke-linecap="round" stroke-linejoin="round">
+                                        <path stroke="none" d="M0 0h24v24H0z" fill="none"></path>
+                                        <path d="M6 15l6 -6l6 6"></path>
+                                    </svg>
+                                </th>
+                                <th>型号</th>
+                                <th>序列号</th>
+                                <th>归属</th>
+                                <th>工单</th>
+                                <th>最后状态</th>
+                                <th>更新时间</th>
+
+
+                                <th></th>
+                            </tr>
+                        </thead>
+                        <tbody>
+
+                            {{range .items}}
+                            <tr>
+                                <td><input class="form-check-input m-0 align-middle" type="checkbox"
+                                        aria-label="Select invoice"></td>
+                                <td><span class="text-secondary">{{.ID}}</span></td>
+                                <td><a href="invoice.html" class="text-reset" tabindex="-1">{{.Name}}</a></td>
+                                <td>
+                                    {{.SerialNumber}}
+                                </td>
+                                <td>
+                                    {{.Destiny}}
+                                </td>
+                                <td>2</td>
+                                <td>
+                                    <span class="badge {{.Color}} me-1"></span> {{.Status}}
+                                </td>
+                                <td>
+                                    {{.UpdatedAt}}
+                                </td>
+
+                                <td class="text-end">
+                                    <button class="btn ">查看</button>
+                                </td>
+                            </tr>
+                            {{end}}
+
+
+                        </tbody>
+                    </table>
+                </div>
+                <div class="card-footer d-flex align-items-center">
+                    <p class="m-0 text-secondary">Showing <span>1</span> to <span>8</span> of <span>16</span> entries
+                    </p>
+                    <ul class="pagination m-0 ms-auto">
+                        <li class="page-item disabled">
+                            <a class="page-link" href="#" tabindex="-1" aria-disabled="true">
+                                <!-- Download SVG icon from http://tabler-icons.io/i/chevron-left -->
+                                <svg xmlns="http://www.w3.org/2000/svg" class="icon" width="24" height="24"
+                                    viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none"
+                                    stroke-linecap="round" stroke-linejoin="round">
+                                    <path stroke="none" d="M0 0h24v24H0z" fill="none"></path>
+                                    <path d="M15 6l-6 6l6 6"></path>
+                                </svg>
+                                prev
+                            </a>
+                        </li>
+                        <li class="page-item"><a class="page-link" href="#">1</a></li>
+                        <li class="page-item active"><a class="page-link" href="#">2</a></li>
+                        <li class="page-item"><a class="page-link" href="#">3</a></li>
+                        <li class="page-item"><a class="page-link" href="#">4</a></li>
+                        <li class="page-item"><a class="page-link" href="#">5</a></li>
+                        <li class="page-item">
+                            <a class="page-link" href="#">
+                                next <!-- Download SVG icon from http://tabler-icons.io/i/chevron-right -->
+                                <svg xmlns="http://www.w3.org/2000/svg" class="icon" width="24" height="24"
+                                    viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none"
+                                    stroke-linecap="round" stroke-linejoin="round">
+                                    <path stroke="none" d="M0 0h24v24H0z" fill="none"></path>
+                                    <path d="M9 6l6 6l-6 6"></path>
+                                </svg>
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        {{template "footer.html"}}
+
+
+    </div>
+</body>
+
+</html>
+
+
+<!-- 弹出内容 -->
+<div class="modal modal-blur fade" id="new_warehouses_item_windows" tabindex="-1" role="dialog" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-lg" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">添加物件</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <div class="row mb-3 align-items-end">
+                    <div class="col-auto">
+                        <a href="#" class="avatar avatar-upload rounded">
+                            <!-- Download SVG icon from http://tabler-icons.io/i/plus -->
+                            <svg xmlns="http://www.w3.org/2000/svg" class="icon" width="24" height="24"
+                                viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none"
+                                stroke-linecap="round" stroke-linejoin="round">
+                                <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+                                <path d="M12 5l0 14" />
+                                <path d="M5 12l14 0" />
+                            </svg>
+                            <span class="avatar-upload-text">添加图片</span>
+                        </a>
+                    </div>
+                    <div class="col">
+                        <label class="form-label">物件名*</label>
+                        <input type="text" class="form-control" maxlength="128" id="item_name" />
+
+                    </div>
+                    <div class="col">
+                        <label class="form-label">序列号</label>
+                        <input type="text" class="form-control" maxlength="100" id="item_sn" />
+                    </div>
+                </div>
+
+                <div class="mb-2">
+                    <label class="form-label">物件说明</label>
+                    <textarea class="form-control" id="item_info"></textarea>
+                </div>
+
+                <div class="row mb-3 align-items-end">
+                    <div class="col">
+                        <label class="form-label">物件归属</label>
+                        <input type="text" class="form-control" maxlength="100" id="item_who" />
+                    </div>
+                    <div class="col">
+                        <label class="form-label">物件数量</label>
+                        <input type="number" class="form-control" id="item_int" />
+                    </div>
+                    <div class="col">
+                        <label class="form-label">物件价值</label>
+                        <input type="number" step="0.01" class="form-control" id="item_consts" />
+                    </div>
+                </div>
+
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn me-auto" data-bs-dismiss="modal"
+                    onclick="new_warehouses_item_windows_dom.hide()">取消</button>
+                <button type="button" class="btn btn-primary" onclick="add_item()">创建</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- libs -->
+<script src="/dist/libs/bootstrap/dist/js/bootstrap.min.js"></script>
+
+<script>
+
+    var items;
+
+    function add_item() {
+        var data_chack = true;
+        //检测数据合法性
+        if ($("#item_name").val() == "") {
+            //console.log("no");
+            data_chack = false;
+            $("#item_name").addClass("is-invalid")
+        }
+
+        if (data_chack) {
+            const url = '/api/v1/warehouses_api/add_item';
+            const sumt_data = {
+                warehouse_id: parseInt("{{.warehouse_id}}", 10),
+                item_name: $("#item_name").val(),
+                item_sn: $("#item_sn").val(),
+                item_info: $("#item_info").val(),
+                item_who: $("#item_who").val(),
+                item_int: parseInt($("#item_int").val(), 10),
+                item_consts: parseFloat($("#item_consts").val()),
+
+            };
+
+            try {
+                const response = axios.post(url, sumt_data, {
+                    headers: {
+                        'Content-Type': 'application/json'
+                    }
+                }).then(response => {
+                    console.log('提交成功:', response.data); // 正确打印服务器数据
+
+                    if (response.data.err_code == 0) {
+                        new_warehouses_item_windows_dom.hide();
+                        location.reload();
+                    }
+
+                });
+            } catch (error) {
+                if (error.response) {
+                    // 服务器返回了错误状态码（如 4xx, 5xx）
+                    console.error('服务器错误:', error.response.data);
+                } else {
+                    console.error('请求未完成:', error.message);
+                }
+            }
+        }
+
+    }
+
+
+    //新建仓库窗口
+    const new_warehouses_item_windows_dom = new bootstrap.Modal('#new_warehouses_item_windows');
+    //输入的时候清除输入框的异常状态
+    $("#item_name").on('input', function () {
+        $("#item_name").removeClass("is-invalid")
+    })
+
+
+
+
+</script>

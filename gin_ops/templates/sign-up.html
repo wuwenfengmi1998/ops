@@ -1,0 +1,254 @@
+<!doctype html>
+<!--
+* Tabler - Premium and Open Source dashboard template with responsive and high quality UI.
+* @version 1.0.0-beta20
+* @link https://tabler.io
+* Copyright 2018-2023 The Tabler Authors
+* Copyright 2018-2023 codecalm.net Paweł Kuna
+* Licensed under MIT (https://github.com/tabler/tabler/blob/master/LICENSE)
+-->
+<html lang="en">
+
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <meta http-equiv="X-UA-Compatible" content="ie=edge" />
+  <title>新用户注册</title>
+
+</head>
+
+<body class=" d-flex flex-column">
+
+  <div class="page page-center">
+
+    {{template "header-min.html" .}}
+
+    <div class="container container-tight py-4">
+      <div class="text-center mb-4">
+        <a href="." class="navbar-brand navbar-brand-autodark">
+          <img src="/static/logo.svg" width="110" height="32" alt="Tabler" class="navbar-brand-image">
+        </a>
+      </div>
+      <div class="card card-md" action="" method="" autocomplete="off" novalidate>
+        <div class="card-body">
+          <h2 class="card-title text-center mb-4">创建新用户</h2>
+          <div class="mb-3">
+            <label class="form-label">用户名</label>
+            <input id="username" type="text" class="form-control" placeholder="输入用户名" maxlength="25">
+            <div id="name_input_err" class="invalid-feedback">不能为空</div>
+          </div>
+          <div class="mb-3">
+            <label class="form-label">邮箱地址</label>
+            <input id="email" type="email" class="form-control" placeholder="输入电子邮箱" maxlength="64">
+            <div id="email_input_err" class="invalid-feedback">不能为空</div>
+          </div>
+          <div class="mb-3">
+            <label class="form-label">密码</label>
+            <div class="input-group input-group-flat">
+              <input id="password" type="password" class="form-control" placeholder="输入密码" autocomplete="off">
+              <span class="input-group-text">
+
+                <a id="show_pass" class="link-secondary " title="显示密码"
+                  data-bs-toggle="tooltip"><!-- Download SVG icon from http://tabler-icons.io/i/eye -->
+                  <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"
+                    stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+                    class="icon icon-tabler icons-tabler-outline icon-tabler-eye">
+                    <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+                    <path d="M10 12a2 2 0 1 0 4 0a2 2 0 0 0 -4 0" />
+                    <path d="M21 12c-2.4 4 -5.4 6 -9 6c-3.6 0 -6.6 -2 -9 -6c2.4 -4 5.4 -6 9 -6c3.6 0 6.6 2 9 6" />
+                  </svg>
+                </a>
+                <a id="show_pass_no" class="link-secondary d-none" title="隐藏密码"
+                  data-bs-toggle="tooltip"><!-- Download SVG icon from http://tabler-icons.io/i/eye -->
+                  <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"
+                    stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+                    class="icon icon-tabler icons-tabler-outline icon-tabler-eye-off">
+                    <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+                    <path d="M10.585 10.587a2 2 0 0 0 2.829 2.828" />
+                    <path
+                      d="M16.681 16.673a8.717 8.717 0 0 1 -4.681 1.327c-3.6 0 -6.6 -2 -9 -6c1.272 -2.12 2.712 -3.678 4.32 -4.674m2.86 -1.146a9.055 9.055 0 0 1 1.82 -.18c3.6 0 6.6 2 9 6c-.666 1.11 -1.379 2.067 -2.138 2.87" />
+                    <path d="M3 3l18 18" />
+                  </svg>
+                </a>
+
+              </span>
+              <div class="invalid-feedback">不能为空</div>
+            </div>
+          </div>
+          <!-- <div class="mb-3">
+              <label class="form-check">
+                <input type="checkbox" class="form-check-input"/>
+                <span class="form-check-label">Agree the <a href="./terms-of-service.html" tabindex="-1">terms and policy</a>.</span>
+              </label>
+            </div> -->
+          <div class="form-footer">
+            <button id="sumtbutton" class="btn btn-primary w-100">创建</button>
+          </div>
+        </div>
+      </div>
+      <div class="text-center text-secondary mt-3">
+        已有账号？ <a href="/sign-in/" tabindex="-1">点击登录</a>
+      </div>
+    </div>
+    {{template "footer.html"}}
+  </div>
+  <!-- Libs JS -->
+  <div class="modal modal-blur fade" id="modal-success" tabindex="-1" role="dialog" aria-hidden="true">
+    <div class="modal-dialog modal-sm modal-dialog-centered" role="document">
+      <div class="modal-content">
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        <div class="modal-status bg-success"></div>
+        <div class="modal-body text-center py-4">
+          <!-- Download SVG icon from http://tabler-icons.io/i/circle-check -->
+          <svg xmlns="http://www.w3.org/2000/svg" class="icon mb-2 text-green icon-lg" width="24" height="24"
+            viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round"
+            stroke-linejoin="round">
+            <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+            <path d="M12 12m-9 0a9 9 0 1 0 18 0a9 9 0 1 0 -18 0" />
+            <path d="M9 12l2 2l4 -4" />
+          </svg>
+          <h3>用户注册成功</h3>
+          <div class="text-secondary">你已成功注册，请前往邮箱激活账号。或者 立即登录</div>
+        </div>
+        <div class="modal-footer">
+          <div class="w-100">
+            <div class="row">
+              <div class="col"><a onclick="location.href = '/'" class="btn w-100" data-bs-dismiss="modal">
+                  返回主页
+                </a></div>
+              <div class="col"><a onclick="location.href = '/sign-in'" class="btn btn-success w-100"
+                  data-bs-dismiss="modal">
+                  立即登录
+                </a></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+</body>
+
+</html>
+
+
+
+<script>
+  //console.log("test");
+  function sup() {
+
+  }
+
+  var username_dom = document.getElementById('username');
+  var email_dom = document.getElementById('email');
+  var password_dom = document.getElementById('password');
+  var show_password_dom = document.getElementById('show_pass');
+  var show_password_no_dom = document.getElementById('show_pass_no');
+
+  username_dom.addEventListener('input', function () {
+    if (username_dom.value != "") {
+      username_dom.classList.remove("is-invalid");
+    }
+  })
+
+  email_dom.addEventListener('input', function () {
+    if (email_dom.value != "") {
+      email_dom.classList.remove("is-invalid");
+    }
+  })
+
+  password_dom.addEventListener('input', function () {
+    if (password_dom.value != "") {
+      password_dom.classList.remove("is-invalid");
+    }
+  })
+
+
+  show_password_dom.addEventListener('click', function () {
+
+    password_dom.type = "text";
+    show_password_dom.classList.add("d-none")
+    show_password_no_dom.classList.remove("d-none");
+
+  })
+  show_password_no_dom.addEventListener('click', function () {
+
+    password_dom.type = "password";
+    show_password_no_dom.classList.add("d-none")
+    show_password_dom.classList.remove("d-none");
+
+  })
+
+
+
+  document.getElementById('sumtbutton').addEventListener('click', function () {
+    //console.log('按钮被点击了！');
+    var from_data_check = true;
+
+    if (username_dom.value == "") {
+      username_dom.classList.add("is-invalid");
+      username_dom.placeholder = "不能为空";
+      from_data_check = false;
+    } else {
+      username_dom.classList.remove("is-invalid");
+    }
+
+    if (email_dom.value == "") {
+      email_dom.classList.add("is-invalid");
+      email_dom.placeholder = "不能为空";
+      document.getElementById("email_input_err").innerHTML = "不能为空";
+      from_data_check = false;
+    } else if (!isValidEmail(email_dom.value)) {
+      email_dom.classList.add("is-invalid");
+      email_dom.placeholder = "不是邮箱";
+      document.getElementById("email_input_err").innerHTML = "不是邮箱";
+      from_data_check = false;
+    } else {
+      email_dom.classList.remove("is-invalid");
+    }
+
+    if (password_dom.value == "") {
+      password_dom.classList.add("is-invalid");
+      password_dom.placeholder = "不能为空";
+      from_data_check = false;
+    } else {
+      password_dom.classList.remove("is-invalid");
+    }
+
+    if (from_data_check) {
+      //console.log("ok");
+      const url = '/api/v1/user/add';
+      const sumt_data = {
+        username: username_dom.value,
+        useremail: email_dom.value,
+        userpass: password_dom.value
+      };
+      try {
+        const response = axios.post(url, sumt_data, {
+          headers: {
+            'Content-Type': 'application/json'
+          }
+        }).then(response => {
+          console.log('提交成功:', response.data); // 正确打印服务器数据
+          if (response.data.err_code == 1) {
+            username_dom.classList.add("is-invalid");
+            document.getElementById("name_input_err").innerHTML = "用户名已存在";
+          } else if (response.data.err_code == 0) {
+            const myModal = new bootstrap.Modal('#modal-success');
+            myModal.show();
+          }
+        });
+      } catch (error) {
+        if (error.response) {
+          // 服务器返回了错误状态码（如 4xx, 5xx）
+          console.error('服务器错误:', error.response.data);
+        } else {
+          console.error('请求未完成:', error.message);
+        }
+      }
+      //console.log(sumt_data);
+
+    }
+  });
+</script>

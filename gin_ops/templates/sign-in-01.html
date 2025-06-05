@@ -1,0 +1,197 @@
+<!doctype html>
+<!--
+* Tabler - Premium and Open Source dashboard template with responsive and high quality UI.
+* @version 1.0.0-beta20
+* @link https://tabler.io
+* Copyright 2018-2023 The Tabler Authors
+* Copyright 2018-2023 codecalm.net Paweł Kuna
+* Licensed under MIT (https://github.com/tabler/tabler/blob/master/LICENSE)
+-->
+<html lang="en">
+
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <meta http-equiv="X-UA-Compatible" content="ie=edge" />
+  <title>登录</title>
+
+</head>
+
+<body class=" d-flex flex-column">
+  <div class="page page-center">
+    {{template "header-min.html" .}}
+    <div class="container container-normal py-4">
+      <div class="row align-items-center g-4">
+        <div class="col-lg">
+          <div class="container-tight">
+            <div class="text-center mb-4">
+              <a href="." class="navbar-brand navbar-brand-autodark"><img src="/static/logo.svg" height="36"
+                  alt=""></a>
+            </div>
+            <div class="card card-md">
+              <div class="card-body">
+                <h2 class="h2 text-center mb-4">登录你的账号</h2>
+
+                <div class="mb-3">
+                  <label class="form-label">用户名</label>
+                  <input id="username" type="text" class="form-control" placeholder="输入你的用户名" autocomplete="off"
+                    maxlength="25">
+                  <div class="invalid-feedback">不能为空</div>
+                </div>
+                <div class="mb-2">
+                  <label class="form-label">
+                    密码
+                  </label>
+                  <div class="input-group input-group-flat">
+                    <input id="password" type="password" class="form-control" placeholder="输入你的密码" autocomplete="off">
+
+                    <span class="input-group-text">
+                      <a id="show_pass" class="link-secondary " title="显示密码"
+                        data-bs-toggle="tooltip"><!-- Download SVG icon from http://tabler-icons.io/i/eye -->
+                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"
+                          stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+                          class="icon icon-tabler icons-tabler-outline icon-tabler-eye">
+                          <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+                          <path d="M10 12a2 2 0 1 0 4 0a2 2 0 0 0 -4 0" />
+                          <path d="M21 12c-2.4 4 -5.4 6 -9 6c-3.6 0 -6.6 -2 -9 -6c2.4 -4 5.4 -6 9 -6c3.6 0 6.6 2 9 6" />
+                        </svg>
+                      </a>
+                      <a id="show_pass_no" class="link-secondary d-none" title="隐藏密码"
+                        data-bs-toggle="tooltip"><!-- Download SVG icon from http://tabler-icons.io/i/eye -->
+                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"
+                          stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+                          class="icon icon-tabler icons-tabler-outline icon-tabler-eye-off">
+                          <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+                          <path d="M10.585 10.587a2 2 0 0 0 2.829 2.828" />
+                          <path
+                            d="M16.681 16.673a8.717 8.717 0 0 1 -4.681 1.327c-3.6 0 -6.6 -2 -9 -6c1.272 -2.12 2.712 -3.678 4.32 -4.674m2.86 -1.146a9.055 9.055 0 0 1 1.82 -.18c3.6 0 6.6 2 9 6c-.666 1.11 -1.379 2.067 -2.138 2.87" />
+                          <path d="M3 3l18 18" />
+                        </svg>
+                      </a>
+                    </span>
+                    <div id="pass_err" class="invalid-feedback">不能为空</div>
+                  </div>
+                </div>
+                <div class="mb-2">
+                  <label class="form-check">
+                    <input id="keep_login" type="checkbox" class="form-check-input" />
+                    <span class="form-check-label">保持登录</span>
+                  </label>
+                </div>
+                <div class="form-footer">
+                  <button onclick="sign_in()" class="btn btn-primary w-100">登录</button>
+                </div>
+
+              </div>
+
+
+            </div>
+            <div class="text-center text-secondary mt-3">
+              还没账号？
+              <a href="/sign-up/" tabindex="-1">点击注册</a>
+              <span class="form-label-description">
+                <a href="./forgot-password.html">忘记密码？</a>
+              </span>
+            </div>
+          </div>
+        </div>
+        <div class="col-lg d-none d-lg-block">
+          <img src="/static/illustrations/undraw_secure_login_pdn4.svg" height="300" class="d-block mx-auto" alt="">
+        </div>
+      </div>
+    </div>
+    {{template "footer.html"}}
+  </div>
+  <!-- Libs JS -->
+
+</body>
+
+</html>
+
+<script>
+  var username_dom = document.getElementById('username');
+  var password_dom = document.getElementById('password');
+  var keep_login_dom = document.getElementById('keep_login');
+  var show_password_dom = document.getElementById('show_pass');
+  var show_password_no_dom = document.getElementById('show_pass_no');
+  show_password_dom.addEventListener('click', function () {
+
+    password_dom.type = "text";
+    show_password_dom.classList.add("d-none")
+    show_password_no_dom.classList.remove("d-none");
+
+  })
+  show_password_no_dom.addEventListener('click', function () {
+
+    password_dom.type = "password";
+    show_password_no_dom.classList.add("d-none")
+    show_password_dom.classList.remove("d-none");
+
+  })
+  username_dom.addEventListener('input', function () {
+    if (username_dom.value != "") {
+      username_dom.classList.remove("is-invalid");
+    }
+  })
+
+  password_dom.addEventListener('input', function () {
+    if (password_dom.value != "") {
+      password_dom.classList.remove("is-invalid");
+    }
+  })
+
+  function sign_in() {
+    var from_data_check = true;
+    if (username_dom.value == "") {
+      username_dom.classList.add("is-invalid");
+      username_dom.placeholder = "不能为空";
+      from_data_check = false;
+    } else {
+      username_dom.classList.remove("is-invalid");
+    }
+    if (password_dom.value == "") {
+      password_dom.classList.add("is-invalid");
+      password_dom.placeholder = "不能为空";
+      from_data_check = false;
+    } else {
+      password_dom.classList.remove("is-invalid");
+    }
+
+    if (from_data_check) {
+      const url = '/api/v1/user/login';
+      const sumt_data = {
+        username: username_dom.value,
+        userpass: password_dom.value,
+        keep_login: keep_login_dom.checked
+      };
+
+      try {
+        const response = axios.post(url, sumt_data, {
+          headers: {
+            'Content-Type': 'application/json'
+          }
+        }).then(response => {
+          console.log('提交成功:', response.data); // 正确打印服务器数据
+          //跳转到主页
+          if (response.data.err_code == 0) {
+            location.href = '/'
+          } else {
+            password_dom.classList.add("is-invalid");
+            document.getElementById("pass_err").innerHTML = "账号或密码错误";
+          }
+
+
+
+        });
+      } catch (error) {
+        if (error.response) {
+          // 服务器返回了错误状态码（如 4xx, 5xx）
+          console.error('服务器错误:', error.response.data);
+        } else {
+          console.error('请求未完成:', error.message);
+        }
+      }
+
+    }
+  }
+</script>
