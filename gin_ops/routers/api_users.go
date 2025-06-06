@@ -1,7 +1,6 @@
 package routers
 
 import (
-	"fmt"
 	"saas/models"
 	"strings"
 	"time"
@@ -64,66 +63,70 @@ func V1_user_api(r *gin.RouterGroup) {
 		//返回前端的数据
 		err_msg = "user_api_error"
 		err_code = Error_code[err_msg]
+
 		//转换传进来的数据
-		var jsonData map[string]interface{}
-		if err := ctx.ShouldBindJSON(&jsonData); err != nil {
-			fmt.Println("解析JSON ERROR:", err)
-			panic(err)
-		}
-		//转换字段
-		newUser := models.User{
-			Name: jsonData["username"].(string),
-			Pass: jsonData["userpass"].(string), // 实际应替换为哈希值
-			// Date 字段无需赋值，数据库会自动填充默认值
-		}
-		//对用户的密码进行哈希替换
-		newUser.Pass = models.Hash_user_pass(newUser.Pass)
+		var jsonData Login_from
+		if err := ctx.ShouldBindJSON(&jsonData); err == nil {
+			//转换字段
+			newUser := models.User{
+				Name: jsonData.Username,
+				Pass: jsonData.Password, // 实际应替换为哈希值
+				// Date 字段无需赋值，数据库会自动填充默认值
+			}
 
-		var user models.User
-		user.Name = newUser.Name
-		if models.DB.Where(&user).First(&user).Error == nil {
-			// 有数据
+			//对用户的密码进行哈希替换
+			newUser.Pass = models.Hash_user_pass(newUser.Pass)
 
-			if user.Pass == newUser.Pass {
-				//成功登录
-				err_msg = "api_ok"
-				err_code = Error_code[err_msg]
-				//发送cookie
-				//cookie时间
-				var cookie_time = 0
-				if jsonData["keep_login"].(bool) {
-					cookie_time = models.User_configs["cookie_timeout"].(int)
+			var user models.User
+			user.Name = newUser.Name
+			if models.DB.Where(&user).First(&user).Error == nil {
+				// 有数据
+
+				if user.Pass == newUser.Pass {
+					//成功登录
+					err_msg = "api_ok"
+					err_code = Error_code[err_msg]
+					//发送cookie
+					//cookie时间
+					var cookie_time = 0
+					if jsonData.Is_keep_login {
+						cookie_time = models.User_configs["cookie_timeout"].(int)
+					}
+
+					cookie := models.Rand_str_32() //生成32字节cookie
+					//cookie := "testcookie"
+					//fmt.Println(cookie)
+					//将cookie写进数据库
+					new_cookie := models.Cookie{}
+					new_cookie.Domain = models.Wed_configs.Host
+					new_cookie.Name = "user"
+					new_cookie.Value = cookie
+					new_cookie.UserID = user.ID
+
+					//cookie时间
+					new_cookie.CreatedAt = time.Now()
+					new_cookie.UpdatedAt = new_cookie.CreatedAt
+					//计算cookie失效时间
+					new_cookie.ExpiresAt = time.Now().Add(time.Duration(models.User_configs["cookie_timeout"].(int)) * time.Second) //计算过期时间
+					new_cookie.SecureFlag = models.Wed_configs.Tls
+					ctx.SetCookie("user", cookie, cookie_time, "/", models.Wed_configs.Host, models.Wed_configs.Tls, true)
+
+					models.DB.Create(&new_cookie) // 传入指针
+
+				} else {
+					//密码错误
+					err_msg = "user_password_err"
+					err_code = Error_code[err_msg]
 				}
 
-				cookie := models.Rand_str_32() //生成32字节cookie
-				//cookie := "testcookie"
-				//fmt.Println(cookie)
-				//将cookie写进数据库
-				new_cookie := models.Cookie{}
-				new_cookie.Domain = models.Wed_configs["host"].(string)
-				new_cookie.Name = "user"
-				new_cookie.Value = cookie
-				new_cookie.UserID = user.ID
-
-				//cookie时间
-				new_cookie.CreatedAt = time.Now()
-				new_cookie.UpdatedAt = new_cookie.CreatedAt
-				//计算cookie失效时间
-				new_cookie.ExpiresAt = time.Now().Add(time.Duration(models.User_configs["cookie_timeout"].(int)) * time.Second) //计算过期时间
-				new_cookie.SecureFlag = models.Wed_configs["tls"].(bool)
-				ctx.SetCookie("user", cookie, cookie_time, "/", models.Wed_configs["host"].(string), models.Wed_configs["tls"].(bool), true)
-
-				models.DB.Create(&new_cookie) // 传入指针
-
 			} else {
-				//密码错误
-				err_msg = "user_password_err"
+				//fmt.Println("用户不存在")
+				err_msg = "user_name_nofind"
 				err_code = Error_code[err_msg]
 			}
 
 		} else {
-			//fmt.Println("用户不存在")
-			err_msg = "user_name_nofind"
+			err_msg = "json_error"
 			err_code = Error_code[err_msg]
 		}
 
@@ -151,7 +154,7 @@ func V1_user_api(r *gin.RouterGroup) {
 			cookie.Value = cookie_vel
 			models.DB.Where(&cookie).Delete(&cookie)
 			//删除前端cookie
-			ctx.SetCookie("user", "", -1, "/", models.Wed_configs["host"].(string), models.Wed_configs["tls"].(bool), true)
+			ctx.SetCookie("user", "", -1, "/", models.Wed_configs.Host, models.Wed_configs.Tls, true)
 
 			err_msg = "api_ok"
 			err_code = Error_code[err_msg]

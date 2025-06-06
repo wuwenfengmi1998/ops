@@ -1,6 +1,6 @@
 web:
   host: "127.0.0.1"
-  web_port: "8080"
+  port: "8080"
   tls: false
   cert_private_path: ""
   cert_public_path: ""

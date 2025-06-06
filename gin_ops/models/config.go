@@ -1,8 +1,10 @@
 package models
 
+import "github.com/mitchellh/mapstructure"
+
 var Configs map[string]interface{}
 
-var Wed_configs map[string]interface{}
+var Wed_configs Wed_configs_t
 
 var Database_configs map[string]interface{}
 
@@ -25,7 +27,11 @@ func init() {
 
 func All_config_init() {
 	//读取web配置
-	Wed_configs = Configs["web"].(map[string]interface{})
+
+	err := mapstructure.Decode(Configs["web"].(map[string]interface{}), &Wed_configs)
+	if err != nil {
+		panic(err)
+	}
 
 	//初始化数据库
 	Database_init()

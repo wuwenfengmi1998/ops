@@ -1,9 +1,26 @@
-.my-input-field {
-	height: 80rpx;
-	padding: 16rpx 1rpx;
+.my_input_field {
+	height: 70rpx;
+	padding: 16rpx 16rpx;
 	border-radius: 18rpx;
-	border: 2rpx solid rgba(58, 77, 128, 0.08);
+	border: 2rpx solid #e3e3e3;
 	font-size: 36rpx;
 	box-shadow: 0 4rpx 12rpx rgba(58, 77, 128, 0.08);
 	
+}
+
+.my_input_placeholder {
+	
+	font-size: 30rpx;
+	color: #cfcfcf;
+	
+	
+}
+
+.my_input_placeholder_error {
+	font-size: 30rpx;
+	color: #d48686;
+}
+
+.my_footer{
+	margin-top: auto;
 }

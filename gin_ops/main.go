@@ -92,18 +92,19 @@ func main() {
 
 	routers.Def_router(r.Group("/")) //分组路由传递到def_routers。go
 
-	var http_port = models.Wed_configs["host"].(string) + ":" + models.Wed_configs["web_port"].(string)
-	if models.Wed_configs["tls"].(bool) {
-		if models.Wed_configs["cert_public_path"] == "" || models.Wed_configs["cert_private_path"] == "" {
+	var http_port = models.Wed_configs.Host + ":" + models.Wed_configs.Port
+	var gin_port = "0.0.0.0" + ":" + models.Wed_configs.Port
+	if models.Wed_configs.Tls {
+		if models.Wed_configs.Cert_public_path == "" || models.Wed_configs.Cert_private_path == "" {
 			fmt.Printf("需要配置证书路径")
 			return
 		} else {
 			fmt.Println("https://" + http_port)
-			r.RunTLS(http_port, models.Wed_configs["cert_public_path"].(string), models.Wed_configs["cert_private_path"].(string))
+			r.RunTLS(gin_port, models.Wed_configs.Cert_public_path, models.Wed_configs.Cert_private_path)
 		}
 	} else {
 		fmt.Println("http://" + http_port)
-		r.Run(http_port)
+		r.Run(gin_port)
 	}
 
 }

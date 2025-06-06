@@ -68,7 +68,7 @@ func Def_router(r *gin.RouterGroup) {
 					} else {
 						//找不到登录权限？？ 可能被封号？
 						//删除前端cookie
-						ctx.SetCookie("user", "", -1, "/", models.Wed_configs["host"].(string), models.Wed_configs["tls"].(bool), true)
+						ctx.SetCookie("user", "", -1, "/", models.Wed_configs.Host, models.Wed_configs.Tls, true)
 					}
 
 				} else {
@@ -77,12 +77,12 @@ func Def_router(r *gin.RouterGroup) {
 					//删除数据库的cookie
 					models.DB.Delete(&cookie)
 					//删除前端cookie
-					ctx.SetCookie("user", "", -1, "/", models.Wed_configs["host"].(string), models.Wed_configs["tls"].(bool), true)
+					ctx.SetCookie("user", "", -1, "/", models.Wed_configs.Host, models.Wed_configs.Tls, true)
 				}
 			} else {
 				//找不到cookie，未登录
 				//删除前端cookie
-				ctx.SetCookie("user", "", -1, "/", models.Wed_configs["host"].(string), models.Wed_configs["tls"].(bool), true)
+				ctx.SetCookie("user", "", -1, "/", models.Wed_configs.Host, models.Wed_configs.Tls, true)
 			}
 
 		}

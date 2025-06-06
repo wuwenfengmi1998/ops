@@ -1,14 +1,13 @@
 <template>
-	<view class="d-flex flex-column">
-		<tabler-header ></tabler-header>
-		<view class="content">
-			<image class="logo" src="/static/logo.png"></image>
-			<view class="text-area">
-				<text class="title">{{title}}</text>
-			</view>
-		</view>
+	<view class="d-flex flex-column ">
+		<div class="page">
+			<tabler-header></tabler-header>
+			
+			<tabler-footer></tabler-footer>
+		</div>
+
 	</view>
-	
+
 </template>
 
 <script>
