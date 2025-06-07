@@ -24,3 +24,14 @@
 .my_footer{
 	margin-top: auto;
 }
+
+.my_offcanvas_top{
+	top: 0;
+	right: 0;
+	left: 0;
+	
+	height: 100rpx;
+	margin-left: 20rpx;
+	margin-right: 20rpx;
+	margin-top: 20rpx;
+}

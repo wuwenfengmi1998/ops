@@ -24,5 +24,7 @@
 	/*每个页面公共css */
 	@import url("/static/dist/css/tabler.min.css");
 	@import url("/mycss.css");
+	
+
 
 </style>

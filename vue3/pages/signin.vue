@@ -58,7 +58,7 @@
 									<a href="./forgot-password.html">忘记密码？</a>
 								</span>
 							</div>
-							
+
 						</div>
 					</div>
 					<div class="col-lg d-none d-lg-block">
@@ -69,9 +69,10 @@
 			</div>
 		</div>
 
-	<tabler-footer></tabler-footer>
+		<tabler-footer ref="footer"></tabler-footer>
 	</view>
 
+	
 
 </template>
 
@@ -79,9 +80,6 @@
 	import {
 		my_network_func
 	} from '../my_network_func'
-	import {
-		Offcanvas
-	} from 'bootstrap'
 
 
 	export default {
@@ -99,6 +97,7 @@
 			}
 		},
 		methods: {
+			
 
 			chack_box_change(val) {
 				//console.log(val.detail.value[0])
@@ -111,6 +110,8 @@
 			submit_data() {
 				//提交登录数据，
 				//先验证数据合法性
+				this.$refs.footer.alert('success',"123")
+				
 				if (this.post_data.username == "") {
 					this.is_username_err = true
 					this.ph_username = "用户名不能为空"
@@ -155,10 +156,7 @@
 
 		font-size: 24px;
 
-
-
-
-
-
 	}
+
+	
 </style>
