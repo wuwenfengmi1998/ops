@@ -6,6 +6,7 @@ import (
 	"time"
 
 	"github.com/gin-gonic/gin"
+	"github.com/mitchellh/mapstructure"
 )
 
 func V1_user_api(r *gin.RouterGroup) {
@@ -15,8 +16,7 @@ func V1_user_api(r *gin.RouterGroup) {
 
 	r.POST("/add", func(ctx *gin.Context) {
 		//返回前端的数据
-		err_msg = "user_api_error"
-		err_code = Error_code[err_msg]
+
 		//转换传进来的数据
 		var jsonData map[string]interface{}
 		if err := ctx.ShouldBindJSON(&jsonData); err == nil {
@@ -37,36 +37,27 @@ func V1_user_api(r *gin.RouterGroup) {
 
 			if models.DB.Where(&user).First(&user).Error == nil {
 				//fmt.Println("找到用户:", user.ID)
-				err_msg = "user_name_dup"
-				err_code = Error_code[err_msg]
+				Return_json(ctx, "user_name_dup", nil)
 			} else {
 				//fmt.Println("用户不存在")
 				models.DB.Create(&newUser) // 传入指针
-				err_msg = "api_ok"
-				err_code = Error_code[err_msg]
+				Return_json(ctx, "api_ok", nil)
 			}
 
 		} else {
-			err_msg = "json_error"
-			err_code = Error_code[err_msg]
+			Return_json(ctx, "json_error", nil)
 		}
-
-		ctx.JSON(200, map[string]interface{}{
-			"api":      "ok",
-			"err_code": err_code,
-			"err_msg":  err_msg,
-		})
+		//Return_json(ctx, "api_err", nil)
 
 	})
 
 	r.POST("/login", func(ctx *gin.Context) {
 		//返回前端的数据
-		err_msg = "user_api_error"
-		err_code = Error_code[err_msg]
 
 		//转换传进来的数据
 		var jsonData Login_from
-		if err := ctx.ShouldBindJSON(&jsonData); err == nil {
+		data, _ := ctx.Get("data")
+		if err := mapstructure.Decode(data, &jsonData); err == nil {
 			//转换字段
 			newUser := models.User{
 				Name: jsonData.Username,
@@ -84,8 +75,6 @@ func V1_user_api(r *gin.RouterGroup) {
 
 				if user.Pass == newUser.Pass {
 					//成功登录
-					err_msg = "api_ok"
-					err_code = Error_code[err_msg]
 					//发送cookie
 					//cookie时间
 					var cookie_time = 0
@@ -113,28 +102,37 @@ func V1_user_api(r *gin.RouterGroup) {
 
 					models.DB.Create(&new_cookie) // 传入指针
 
+					//获取用户info
+					user_info := models.User_info{
+						UserID: user.ID,
+					}
+
+					models.DB.Where(&user_info).First(&user_info)
+
+					red := map[string]interface{}{
+						"cookie":    new_cookie,
+						"user_info": user_info,
+					}
+
+					Return_json(ctx, "api_ok", red)
+
 				} else {
 					//密码错误
-					err_msg = "user_password_err"
-					err_code = Error_code[err_msg]
+
+					Return_json(ctx, "user_password_err", nil)
 				}
 
 			} else {
 				//fmt.Println("用户不存在")
-				err_msg = "user_name_nofind"
-				err_code = Error_code[err_msg]
+
+				Return_json(ctx, "user_name_nofind", nil)
 			}
 
 		} else {
-			err_msg = "json_error"
-			err_code = Error_code[err_msg]
+			Return_json(ctx, "json_error", nil)
 		}
 
-		ctx.JSON(200, map[string]interface{}{
-			"api":      "ok",
-			"err_code": err_code,
-			"err_msg":  err_msg,
-		})
+		//Return_json(ctx, "api_err", nil)
 
 	})
 

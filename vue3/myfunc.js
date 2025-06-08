@@ -2,15 +2,39 @@ export const myfunc = {
 
 	themeStorageKey:"tablerTheme",
 	defaultTheme:"light",
+	
+	save(key,data){
+		uni.setStorageSync(key, data)
+	},
+	load(key){
+		return uni.getStorageSync(key)
+	},
+	dele(key){
+		uni.removeStorageSync(key)
+	},
+	
+	save_json(key,data){
+		this.save(key,JSON.stringify(data))
+	},
+	
+	load_json(key){
+		var js_data=this.load(key)
+		if(js_data){
+			return JSON.parse(js_data)
+		}else{
+			return null
+		}
+		
+	},
 
 	getThemefromStorge() {
-		var storedTheme = localStorage.getItem(this.themeStorageKey);
+		var storedTheme = this.load(this.themeStorageKey);
 		return storedTheme ? storedTheme : this.defaultTheme;
 	},
 
 	setTheme(selectedTheme,save) {
 		if(save){
-			localStorage.setItem(this.themeStorageKey, selectedTheme); // 保存到本地存储
+			this.save(this.themeStorageKey, selectedTheme); // 保存到本地存储
 		}
 		if (selectedTheme === 'dark') {
 			document.body.setAttribute("data-bs-theme", selectedTheme); // 暗色模式

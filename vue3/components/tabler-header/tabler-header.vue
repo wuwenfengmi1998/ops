@@ -159,7 +159,23 @@
 		methods:{
 			switchTheme(theme){
 				myfunc.setTheme(theme,true);
-			}
+			},
+			logout(){
+				myfunc.dele("user_info")
+				myfunc.dele("cookie")
+			},
+			updata_user_info_to_heard(){
+				//h5先判断有没有cookie
+				var cookie=myfunc.load_json("cookie")
+				if (cookie){
+					//判断cookie有没有过期
+				}else{
+					this.logout()
+				}
+			},
+		},
+		mounted() {
+			this.updata_user_info_to_heard()
 		}
 	}
 </script>

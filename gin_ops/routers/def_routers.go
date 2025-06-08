@@ -8,13 +8,32 @@ import (
 	"time"
 
 	"github.com/gin-gonic/gin"
+	"github.com/mitchellh/mapstructure"
 )
 
 func Def_router(r *gin.RouterGroup) {
 	r.Use(func(ctx *gin.Context) {
 		ctx.Set("is_login", false)
+
+		cookie_vel := ""
 		//读取用户cookie，判断用户是否已登录
-		cookie_vel, _ := ctx.Cookie("user")
+		cookie_s, _ := ctx.Cookie("user")
+		cookie_vel = cookie_s
+		//转换传进来的数据
+		var jsonData map[string]interface{}
+		if err := ctx.ShouldBindJSON(&jsonData); err == nil {
+			//分离数据
+			var cookie_t models.Cookie
+			if err = mapstructure.Decode(jsonData["cookie"], &cookie_t); err == nil {
+				cookie_vel = cookie_t.Value
+			}
+			var data_t map[string]interface{}
+			if err = mapstructure.Decode(jsonData["data"], &data_t); err == nil {
+				ctx.Set("data", data_t)
+			}
+
+		}
+
 		//fmt.Println(cookie_vel)
 		if cookie_vel != "" {
 			var cookie models.Cookie

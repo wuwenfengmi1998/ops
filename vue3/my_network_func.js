@@ -1,9 +1,19 @@
+import { myfunc } from "./myfunc";
+
 export const my_network_func = {
 	host: "",
 	port: 0,
 	head_path: "/api/v1",
 
 	post_json(path, json,callback) {
+		//把cookie插入json
+		var data={}
+		data['data']=json
+		var cookie =myfunc.load_json("cookie")
+		if(cookie)
+		{
+			data['cookie']=cookie
+		}
 		var re_data = {}
 		uni.request({
 			header: {
@@ -11,7 +21,7 @@ export const my_network_func = {
 			},
 			url: this.head_path + path,
 			method: 'POST',
-			data: json,
+			data: data,
 			timeout: 10000,
 			success(res) {
 

@@ -35,14 +35,14 @@
 											maxlength="100" v-model="post_data.password">
 
 									</div>
-									<div class="mb-2">
+<!-- 									<div class="mb-2">
 										<checkbox-group @change="chack_box_change">
 											<label class="d-flex">
 												<checkbox value="keep_login_in" />
 												<span class="form-check-label">保持登录</span>
 											</label>
 										</checkbox-group>
-									</div>
+									</div> -->
 									<div class="form-footer">
 										<button class="btn btn-primary w-100" @click="submit_data">登录</button>
 									</div>
@@ -72,7 +72,7 @@
 		<tabler-footer ref="footer"></tabler-footer>
 	</view>
 
-	
+
 
 </template>
 
@@ -80,24 +80,35 @@
 	import {
 		my_network_func
 	} from '../my_network_func'
+	import {
+		myfunc
+	} from '../myfunc'
 
 
 	export default {
 		data() {
 			return {
-				ph_username: "输入你的用户名",
-				ph_password: "输入你的密码",
+				ph_username: "",
+				ph_password: "",
 				is_username_err: false,
 				is_password_err: false,
 				post_data: {
-					is_keep_login: false,
+					is_keep_login: true,
 					username: "",
 					password: "",
 				}
 			}
 		},
 		methods: {
-			
+			initdata(){
+				this.ph_username="输入你的用户名"
+				this.ph_password="输入你的密码"
+				this.is_username_err=false
+				this.is_password_err=false
+				this.post_data.is_keep_login=true
+				this.post_data.username=""
+				this.post_data.password=""
+			},
 
 			chack_box_change(val) {
 				//console.log(val.detail.value[0])
@@ -110,8 +121,8 @@
 			submit_data() {
 				//提交登录数据，
 				//先验证数据合法性
-				this.$refs.footer.alert('success',"123")
-				
+
+
 				if (this.post_data.username == "") {
 					this.is_username_err = true
 					this.ph_username = "用户名不能为空"
@@ -132,14 +143,35 @@
 					console.log(this.post_data)
 					my_network_func.post_json("/user/login", this.post_data, (c) => {
 						console.log(c)
+						if (c.statusCode == 200) {
+							if (c.data.err_code == 0) {
+								this.$refs.footer.alert('success', "登录成功")
+								myfunc.save_json("cookie", c.data.return.cookie)
+								myfunc.save_json("user_info", c.data.return.user_info)
+								this.initdata()
+								setTimeout(() => {
+									uni.navigateTo({
+										url: '/'
+									});
+								}, 1000);
+
+							} else {
+								this.$refs.footer.alert('warning', "账号或密码不正确")
+							}
+						} else {
+							this.$refs.footer.alert('danger', "网络连接错误：" + c.statusCode)
+						}
+
+
 					})
 				} else {
 
 				}
 
-
-
 			}
+		},
+		mounted() {
+			this.initdata()
 		}
 	}
 </script>
@@ -157,6 +189,4 @@
 		font-size: 24px;
 
 	}
-
-	
 </style>

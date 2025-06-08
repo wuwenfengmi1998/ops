@@ -1,5 +1,6 @@
 {
     "api_ok":0,
+    "api_err":-1,
     "user_name_dup":1,
     "user_name_nofind":2,
     "user_password_err":3,
