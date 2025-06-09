@@ -83,7 +83,7 @@
 
 	<tabler-footer></tabler-footer>
 
-	<uni-popup ref="popup" type="center">
+	<uni-popup ref="popup" type="center" >
 		<view class="popup-content">
 			这里是弹框内容
 			<button @click="closePopup">关闭</button>
