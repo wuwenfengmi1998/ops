@@ -41,6 +41,9 @@ func V1_user_api(r *gin.RouterGroup) {
 			} else {
 				//fmt.Println("用户不存在")
 				models.DB.Create(&newUser) // 传入指针
+
+				//创建info
+
 				Return_json(ctx, "api_ok", nil)
 			}
 
@@ -98,8 +101,11 @@ func V1_user_api(r *gin.RouterGroup) {
 					//计算cookie失效时间
 					new_cookie.ExpiresAt = time.Now().Add(time.Duration(models.User_configs["cookie_timeout"].(int)) * time.Second) //计算过期时间
 					new_cookie.SecureFlag = models.Wed_configs.Tls
-					ctx.SetCookie("user", cookie, cookie_time, "/", models.Wed_configs.Host, models.Wed_configs.Tls, true)
 
+					//发送到前端
+					ctx.SetCookie("user", cookie, cookie_time, "/", models.Wed_configs.Host, models.Wed_configs.Tls, true)
+					ctx.Set("cookie", new_cookie)
+					//写到数据库
 					models.DB.Create(&new_cookie) // 传入指针
 
 					//获取用户info
@@ -138,36 +144,31 @@ func V1_user_api(r *gin.RouterGroup) {
 
 	r.POST("/logout", func(ctx *gin.Context) {
 		//返回前端的数据
-		err_msg = "user_api_error"
-		err_code = Error_code[err_msg]
 
 		//先判断是否已经登录
 		//获取中间件处理的结果
-		is_login, _ := ctx.Get("is_login")
+		_, is_login := ctx.Get("user_info")
 		if is_login == true {
 			//fmt.Println("loged")
-			cookie_vel, _ := ctx.Cookie("user") //这个cookie在中间件已经判断为有效的，否则is_login不可能为true，所以直接在数据库删除应该是安全的
+			cookie_any, _ := ctx.Get("cookie") //这个cookie在中间件已经判断为有效的，否则is_login不可能为true，所以直接在数据库删除应该是安全的
 			//删除数据库里的cookie
 			var cookie models.Cookie
-			cookie.Value = cookie_vel
-			models.DB.Where(&cookie).Delete(&cookie)
-			//删除前端cookie
-			ctx.SetCookie("user", "", -1, "/", models.Wed_configs.Host, models.Wed_configs.Tls, true)
+			if err := mapstructure.Decode(cookie_any, &cookie); err == nil {
+				models.DB.Where(&cookie).Delete(&cookie)
+				//删除前端cookie
+				ctx.SetCookie("user", "", -1, "/", models.Wed_configs.Host, models.Wed_configs.Tls, true)
+				ctx.Set("cookie", nil)
 
-			err_msg = "api_ok"
-			err_code = Error_code[err_msg]
+				Return_json(ctx, "api_ok", nil)
+			} else {
+				Return_json(ctx, "json_error", nil)
+			}
 
 		} else {
-			//fmt.Println("no loged")
-			err_msg = "user_no_sign"
-			err_code = Error_code[err_msg]
+
+			Return_json(ctx, "user_no_sign", nil)
 		}
 
-		ctx.JSON(200, map[string]interface{}{
-			"api":      "ok",
-			"err_code": err_code,
-			"err_msg":  err_msg,
-		})
 	})
 
 	r.POST("/updata_info", func(ctx *gin.Context) {

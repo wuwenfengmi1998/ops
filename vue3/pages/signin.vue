@@ -140,9 +140,9 @@
 				}
 
 				if (this.is_username_err === false && this.is_password_err === false) {
-					console.log(this.post_data)
+					
 					my_network_func.post_json("/user/login", this.post_data, (c) => {
-						console.log(c)
+						
 						if (c.statusCode == 200) {
 							if (c.data.err_code == 0) {
 								this.$refs.footer.alert('success', "登录成功")

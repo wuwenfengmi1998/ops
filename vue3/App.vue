@@ -10,11 +10,8 @@
 			console.log('App Hide')
 		}
 	}
-	
 	import "/static/dist/js/tabler.min.js"
-
-	
-	
+	import "/static/dist/libs/bootstrap/dist/js/bootstrap.min.js"
 </script>
 
 
@@ -24,7 +21,5 @@
 	/*每个页面公共css */
 	@import url("/static/dist/css/tabler.min.css");
 	@import url("/mycss.css");
-	
-
 
 </style>

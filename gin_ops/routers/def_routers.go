@@ -13,7 +13,6 @@ import (
 
 func Def_router(r *gin.RouterGroup) {
 	r.Use(func(ctx *gin.Context) {
-		ctx.Set("is_login", false)
 
 		cookie_vel := ""
 		//读取用户cookie，判断用户是否已登录
@@ -29,7 +28,7 @@ func Def_router(r *gin.RouterGroup) {
 			}
 			var data_t map[string]interface{}
 			if err = mapstructure.Decode(jsonData["data"], &data_t); err == nil {
-				ctx.Set("data", data_t)
+				ctx.Set("data", &data_t)
 			}
 
 		}
@@ -44,20 +43,17 @@ func Def_router(r *gin.RouterGroup) {
 				if cookie.ExpiresAt.After(time.Now()) {
 					// ExpiresAt 在当前时间之后（未过期）
 					//fmt.Println("Cookie 未过期")
-					//cookie有效，说明已经登录，cookie过期时间延长，避免大量写入数据库，先判断还有多久过期，小于一天才刷新
-					// 计算过期时间与当前时间的差值
-					remaining := time.Until(cookie.ExpiresAt) // 直接使用 time.Until
 
-					if remaining < 24*time.Hour {
-						//fmt.Println("剩余时间不足 1 天")
-						var cookie_up models.Cookie
-						cookie_up.UpdatedAt = time.Now()
-						cookie_up.ExpiresAt = time.Now().Add(time.Duration(models.User_configs["cookie_timeout"].(int)) * time.Second) //计算过期时间
-						models.DB.Model(&models.Cookie{}).Where(&cookie).Updates(&cookie_up)
-					} else {
-						//fmt.Println("cookie时间大于一天")
-					}
-
+					//每次调用都更新cookie的最新状态 ，用于计算在线
+					var cookie_up models.Cookie
+					cookie_up.UpdatedAt = time.Now()
+					cookie_up.ExpiresAt = time.Now().Add(time.Duration(models.User_configs["cookie_timeout"].(int)) * time.Second) //计算过期时间
+					models.DB.Model(&models.Cookie{}).Where(&cookie).Updates(&cookie_up)
+					//更新前端cookie
+					ctx.SetCookie("user", cookie.Value, models.User_configs["cookie_timeout"].(int), "/", models.Wed_configs.Host, models.Wed_configs.Tls, true)
+					cookie.UpdatedAt = cookie_up.UpdatedAt
+					cookie.ExpiresAt = cookie_up.ExpiresAt
+					ctx.Set("cookie", cookie)
 					//读取用户权限信息
 					var user models.User
 					user.ID = cookie.UserID
@@ -79,15 +75,15 @@ func Def_router(r *gin.RouterGroup) {
 							user_info.UserID = cookie.UserID
 							models.DB.Create(&user_info) // 传入指针
 						}
-
-						ctx.Set("is_login", true)
+						//写入当前登录的用户信息 传递给下一个组件
 						ctx.Set("user_info", &user_info)
-						ctx.Set("user", &user)
-
 					} else {
 						//找不到登录权限？？ 可能被封号？
 						//删除前端cookie
 						ctx.SetCookie("user", "", -1, "/", models.Wed_configs.Host, models.Wed_configs.Tls, true)
+						cookie.Value = ""
+						cookie.ExpiresAt = time.Now()
+						ctx.Set("cookie", cookie)
 					}
 
 				} else {
@@ -97,11 +93,17 @@ func Def_router(r *gin.RouterGroup) {
 					models.DB.Delete(&cookie)
 					//删除前端cookie
 					ctx.SetCookie("user", "", -1, "/", models.Wed_configs.Host, models.Wed_configs.Tls, true)
+					cookie.Value = ""
+					cookie.ExpiresAt = time.Now()
+					ctx.Set("cookie", cookie)
 				}
 			} else {
 				//找不到cookie，未登录
 				//删除前端cookie
 				ctx.SetCookie("user", "", -1, "/", models.Wed_configs.Host, models.Wed_configs.Tls, true)
+				cookie.Value = ""
+				cookie.ExpiresAt = time.Now()
+				ctx.Set("cookie", cookie)
 			}
 
 		}

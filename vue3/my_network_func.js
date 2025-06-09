@@ -26,7 +26,20 @@ export const my_network_func = {
 			success(res) {
 
 				re_data["statusCode"] = res.statusCode
-				re_data["data"] = res.data
+				//载入服务器返回的数据
+				if(res.data){
+					re_data["data"] = res.data
+				}
+				//自动保存服务器发送的cookie
+				if(res.cookie){
+					if(res.cookie.Value=="")
+					{
+						myfunc.dele("cookie")
+					}else{
+						myfunc.save_json("cookie", res.cookie)
+					}
+					
+				}
 				callback(re_data)
 				
 			},

@@ -34,7 +34,32 @@
 					</a>
 				</div>
 				<!-- 深色模式按钮 -->
-				<div v-if="type!='mini'" class="nav-item btn-list">
+
+				<div v-if="is_login" class="nav-item dropdown">
+					<a class="nav-link d-flex lh-1 text-reset p-0" data-bs-toggle="dropdown"
+						aria-label="Open user menu">
+						
+						<avatar size="sm" :url="user_info.AvatarPath"></avatar>
+						<div class="d-none d-xl-block ps-2">
+							<div>{{user_info.Username}}</div>
+							<div class="mt-1 small text-secondary">{{user_info.FirstName}}</div>
+						</div>
+					</a>
+					<div class="dropdown-menu dropdown-menu-end dropdown-menu-arrow ">
+						<!-- <a href="#" class="dropdown-item">Status</a> -->
+						<a href="./profile" class="dropdown-item">个人资料</a>
+						<!-- <a href="#" class="dropdown-item">Feedback</a> -->
+						<a href="/#/pages/setting/my_info" class="dropdown-item">设置</a>
+						<div class="dropdown-divider"></div>
+						<a href="#" @click="logout(true)" class="dropdown-item">登出</a>
+					</div>
+				</div>
+
+
+
+
+
+				<div v-if="type!='mini' && !is_login" class="nav-item btn-list">
 					<a href="/#/pages/signin" class="btn" rel="noreferrer">
 						<!-- Download SVG icon from http://tabler-icons.io/i/heart -->
 						<svg xmlns="http://www.w3.org/2000/svg" class="icon text-blue" width="24" height="24"
@@ -56,6 +81,8 @@
 						登录/注册
 					</a>
 				</div>
+
+
 
 
 			</div>
@@ -135,12 +162,16 @@
 
 <script>
 	import {
+		my_network_func
+	} from '../../my_network_func';
+	import {
 		myfunc
 	} from '../../myfunc';
 
 
 
-	myfunc.setTheme(myfunc.getThemefromStorge(),false);
+	myfunc.setTheme(myfunc.getThemefromStorge(), false);
+
 
 
 	export default {
@@ -153,24 +184,54 @@
 		},
 		data() {
 			return {
-
+				is_login: false,
+				user_info:{
+					AvatarPath:"",
+					Username:"",
+					FirstName:"",
+					Birthdate:"",
+				}
 			};
 		},
-		methods:{
-			switchTheme(theme){
-				myfunc.setTheme(theme,true);
+		methods: {
+			switchTheme(theme) {
+				myfunc.setTheme(theme, true);
 			},
-			logout(){
+			logout(logout_server) {
+				if (logout_server) {
+					my_network_func.post_json("/user/logout", null, (c) => {
+						if (c.statusCode == 200) {
+							console.log(c)
+
+						}
+					})
+				}
+
+				this.is_login = false
 				myfunc.dele("user_info")
 				myfunc.dele("cookie")
+
 			},
-			updata_user_info_to_heard(){
+			updata_user_info_to_heard() {
 				//h5先判断有没有cookie
-				var cookie=myfunc.load_json("cookie")
-				if (cookie){
+				var cookie = myfunc.load_json("cookie")
+				if (cookie) {
 					//判断cookie有没有过期
-				}else{
-					this.logout()
+					const isFuture = new Date(cookie.ExpiresAt) > new Date();
+					if (isFuture) {
+						//没过期
+						this.is_login = true
+						//获取用户信息
+						this.user_info = myfunc.load_json("user_info")
+
+					} else {
+						//过期了
+						this.logout(false)
+						//如何是h5平台 在请求的时候本地cookie应该就被服务器删了
+					}
+
+				} else {
+					this.logout(false)
 				}
 			},
 		},

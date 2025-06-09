@@ -14,7 +14,21 @@
 			}
 		},
 		{
+			"path" : "pages/setting/my_info",
+			"style" : 
+			{
+				"navigationBarTitleText" : ""
+			}
+		},
+		{
 			"path" : "pages/signin",
+			"style" : 
+			{
+				"navigationBarTitleText" : ""
+			}
+		},
+		{
+			"path" : "components/setting-menu/setting-menu",
 			"style" : 
 			{
 				"navigationBarTitleText" : ""
