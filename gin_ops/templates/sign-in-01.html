@@ -25,8 +25,7 @@
         <div class="col-lg">
           <div class="container-tight">
             <div class="text-center mb-4">
-              <a href="." class="navbar-brand navbar-brand-autodark"><img src="/static/logo.svg" height="36"
-                  alt=""></a>
+              <a href="." class="navbar-brand navbar-brand-autodark"><img src="/static/logo.svg" height="36" alt=""></a>
             </div>
             <div class="card card-md">
               <div class="card-body">
@@ -160,9 +159,12 @@
     if (from_data_check) {
       const url = '/api/v1/user/login';
       const sumt_data = {
-        username: username_dom.value,
-        password: password_dom.value,
-        is_keep_login: keep_login_dom.checked
+        data: {
+          username: username_dom.value,
+          password: password_dom.value,
+          is_keep_login: keep_login_dom.checked
+        },
+
       };
 
       try {

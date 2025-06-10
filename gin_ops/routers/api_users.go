@@ -18,6 +18,7 @@ func V1_user_api(r *gin.RouterGroup) {
 		//返回前端的数据
 
 		//转换传进来的数据
+
 		var jsonData map[string]interface{}
 		if err := ctx.ShouldBindJSON(&jsonData); err == nil {
 			//转换字段

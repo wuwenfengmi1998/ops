@@ -77,6 +77,7 @@ func Def_router(r *gin.RouterGroup) {
 						}
 						//写入当前登录的用户信息 传递给下一个组件
 						ctx.Set("user_info", &user_info)
+						ctx.Set("user", &user)
 					} else {
 						//找不到登录权限？？ 可能被封号？
 						//删除前端cookie
@@ -114,8 +115,7 @@ func Def_router(r *gin.RouterGroup) {
 
 	//无需权限的页面
 	r.GET("/", func(ctx *gin.Context) {
-		is_login, _ := ctx.Get("is_login")
-		user_info, _ := ctx.Get("user_info")
+		user_info, is_login := ctx.Get("user_info")
 		ctx.HTML(http.StatusOK, "index.html", gin.H{
 			"is_login":  is_login,
 			"user_info": user_info,
@@ -266,16 +266,15 @@ func Def_router(r *gin.RouterGroup) {
 		}
 	})
 	r.GET("/setting-my", func(ctx *gin.Context) {
-		is_login, _ := ctx.Get("is_login")
-		user_info, _ := ctx.Get("user_info")
-		user, _ := ctx.Get("user")
+
+		user_info, is_login := ctx.Get("user_info")
+
 		//判断是否登录
 		if is_login == true {
 
 			ctx.HTML(http.StatusOK, "setting-my.html", gin.H{
 				"is_login":  is_login,
 				"user_info": user_info,
-				"user":      user,
 			})
 		} else {
 			ctx.HTML(404, "error_404.html", gin.H{})
@@ -284,8 +283,7 @@ func Def_router(r *gin.RouterGroup) {
 	})
 
 	r.GET("/setting-security", func(ctx *gin.Context) {
-		is_login, _ := ctx.Get("is_login")
-		user_info, _ := ctx.Get("user_info")
+		user_info, is_login := ctx.Get("user_info")
 		user, _ := ctx.Get("user")
 		//判断是否登录
 		if is_login == true {

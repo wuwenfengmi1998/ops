@@ -220,9 +220,12 @@
       //console.log("ok");
       const url = '/api/v1/user/add';
       const sumt_data = {
-        username: username_dom.value,
-        useremail: email_dom.value,
-        userpass: password_dom.value
+        data: {
+          username: username_dom.value,
+          useremail: email_dom.value,
+          userpass: password_dom.value
+        },
+
       };
       try {
         const response = axios.post(url, sumt_data, {
