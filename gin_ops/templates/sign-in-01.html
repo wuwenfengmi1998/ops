@@ -157,42 +157,27 @@
     }
 
     if (from_data_check) {
-      const url = '/api/v1/user/login';
-      const sumt_data = {
-        data: {
+      post_json("/user/login", {
           username: username_dom.value,
           password: password_dom.value,
           is_keep_login: keep_login_dom.checked
-        },
+        }, (c) => {
+          if (c.statusCode == 200) {
+							if (c.data.err_code == 0) {
+								save_json("cookie", c.data.return.cookie)
+								save_json("user_info", c.data.return.user_info)
+								setTimeout(() => {
+									location.href = '/'
+								}, 500);
+							} else {
+								//this.$refs.footer.alert('warning', "账号或密码不正确")
+							}
+						} else {
+							//this.$refs.footer.alert('danger', "网络连接错误：" + c.statusCode)
+						}
+        })
 
-      };
-
-      try {
-        const response = axios.post(url, sumt_data, {
-          headers: {
-            'Content-Type': 'application/json'
-          }
-        }).then(response => {
-          console.log('提交成功:', response.data); // 正确打印服务器数据
-          //跳转到主页
-          if (response.data.err_code == 0) {
-            location.href = '/'
-          } else {
-            password_dom.classList.add("is-invalid");
-            document.getElementById("pass_err").innerHTML = "账号或密码错误";
-          }
-
-
-
-        });
-      } catch (error) {
-        if (error.response) {
-          // 服务器返回了错误状态码（如 4xx, 5xx）
-          console.error('服务器错误:', error.response.data);
-        } else {
-          console.error('请求未完成:', error.message);
-        }
-      }
+   
 
     }
   }

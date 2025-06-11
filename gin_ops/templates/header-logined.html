@@ -100,31 +100,15 @@
 
 <script>
   function logout() {
-    console.log("logout");
-    const url = '/api/v1/user/logout';
-    const sumt_data = {
-      cookie: "",
-    };
-
-    try {
-      const response = axios.post(url, sumt_data, {
-        headers: {
-          'Content-Type': 'application/json'
-        }
-      }).then(response => {
-        //console.log('提交成功:', response.data); // 正确打印服务器数据
-        //跳转到主页
-        if (response.data.err_code == 0) {
+    post_json("/user/logout", null, (c) => {
+      if (c.statusCode == 200) {
+        console.log(c)
+        dele("user_info")
+        dele("cookie")
+        setTimeout(() => {
           location.href = '/'
-        }
-      });
-    } catch (error) {
-      if (error.response) {
-        // 服务器返回了错误状态码（如 4xx, 5xx）
-        console.error('服务器错误:', error.response.data);
-      } else {
-        console.error('请求未完成:', error.message);
+        }, 500);
       }
-    }
+    })
   }
 </script>
