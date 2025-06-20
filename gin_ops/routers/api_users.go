@@ -1,6 +1,7 @@
 package routers
 
 import (
+	"fmt"
 	"saas/models"
 	"strings"
 	"time"
@@ -41,8 +42,8 @@ func V1_user_api(r *gin.RouterGroup) {
 				Return_json(ctx, "user_name_dup", nil)
 			} else {
 				//fmt.Println("用户不存在")
-				models.DB.Create(&newUser) // 传入指针
-
+				dd := models.DB.Create(&newUser) // 传入指针
+				fmt.Println(dd)
 				//创建info
 
 				Return_json(ctx, "api_ok", nil)
