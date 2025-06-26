@@ -86,11 +86,14 @@ func main() {
 
 	// 自定义 404 页面（需要提前加载模板）
 	r.NoRoute(func(ctx *gin.Context) {
-
 		ctx.HTML(404, "error_404.html", gin.H{})
 	})
 
-	routers.Def_router(r.Group("/")) //分组路由传递到def_routers。go
+	r.Use(func(ctx *gin.Context) {
+		routers.Fitst_use(ctx)
+	})
+	routers.Def_router(r.Group("/"))     //分组路由传递到def_routers。go
+	routers.Api_router(r.Group("/api/")) //分组路由传递到api_routers。go
 
 	var http_port = models.Wed_configs.Host + ":" + models.Wed_configs.Port
 	var gin_port = "0.0.0.0" + ":" + models.Wed_configs.Port

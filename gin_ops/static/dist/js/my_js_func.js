@@ -47,7 +47,7 @@ function post_json(path, json, callback) {
       },
     })
     .then((response) => {
-      console.log(response)
+      //console.log(response)
       re_data["statusCode"] = response.status;
       //载入服务器返回的数据
       if (response.data) {
