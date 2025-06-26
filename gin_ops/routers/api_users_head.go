@@ -5,3 +5,9 @@ type Login_from struct {
 	Username      string `json:"username"`
 	Password      string `json:"password"`
 }
+
+type Add_user_from struct {
+	Useremail string `json:"useremail"`
+	Username  string `json:"username"`
+	Userpass  string `json:"userpass"`
+}

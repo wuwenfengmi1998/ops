@@ -218,39 +218,32 @@
 
     if (from_data_check) {
       //console.log("ok");
-      const url = '/api/v1/user/add';
-      const sumt_data = {
-        data: {
-          username: username_dom.value,
-          useremail: email_dom.value,
-          userpass: password_dom.value
-        },
 
-      };
-      try {
-        const response = axios.post(url, sumt_data, {
-          headers: {
-            'Content-Type': 'application/json'
+      post_json("/user/add", {
+        username: username_dom.value,
+        useremail: email_dom.value,
+        userpass: password_dom.value
+      }, (c) => {
+        if (c.statusCode == 200) {
+
+          switch (c.data.err_code) {
+            case 0:
+              banner_alert('success', "注册成功", 950)
+              setTimeout(() => {
+                location.href = '/sign-in'
+              }, 1000);
+              break;
+            case 1:
+              banner_alert('warning', "用户名已存在", 1000)
+              break;
           }
-        }).then(response => {
-          console.log('提交成功:', response.data); // 正确打印服务器数据
-          if (response.data.err_code == 1) {
-            username_dom.classList.add("is-invalid");
-            document.getElementById("name_input_err").innerHTML = "用户名已存在";
-          } else if (response.data.err_code == 0) {
-            const myModal = new bootstrap.Modal('#modal-success');
-            myModal.show();
-          }
-        });
-      } catch (error) {
-        if (error.response) {
-          // 服务器返回了错误状态码（如 4xx, 5xx）
-          console.error('服务器错误:', error.response.data);
+
         } else {
-          console.error('请求未完成:', error.message);
+          banner_alert('danger', "网络连接错误：" + c.error, 10000)
         }
-      }
-      //console.log(sumt_data);
+      })
+
+
 
     }
   });

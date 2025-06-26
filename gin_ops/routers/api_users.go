@@ -19,17 +19,19 @@ func V1_user_api(r *gin.RouterGroup) {
 		//返回前端的数据
 
 		//转换传进来的数据
-
-		var jsonData map[string]interface{}
-		if err := ctx.ShouldBindJSON(&jsonData); err == nil {
+		//转换传进来的数据
+		var jsonData Add_user_from
+		data, _ := ctx.Get("data")
+		if err := mapstructure.Decode(data, &jsonData); err == nil {
 			//转换字段
 			newUser := models.User{
-				Name:  jsonData["username"].(string),
-				Email: jsonData["useremail"].(string),
-				Pass:  jsonData["userpass"].(string), // 实际应替换为哈希值
+				Name:  jsonData.Username,
+				Email: jsonData.Useremail,
+				Pass:  jsonData.Userpass, // 实际应替换为哈希值
 				Date:  time.Now(),
 				// Date 字段无需赋值，数据库会自动填充默认值
 			}
+			//fmt.Println(newUser)
 			//对用户的密码进行哈希替换
 			newUser.Pass = models.Hash_user_pass(newUser.Pass)
 
@@ -42,9 +44,13 @@ func V1_user_api(r *gin.RouterGroup) {
 				Return_json(ctx, "user_name_dup", nil)
 			} else {
 				//fmt.Println("用户不存在")
-				dd := models.DB.Create(&newUser) // 传入指针
-				fmt.Println(dd)
+				models.DB.Create(&newUser) // 传入指针
+
 				//创建info
+				var user_info models.User_info
+				user_info.AvatarPath = models.User_configs["def_avatar_path"].(string)
+				user_info.UserID = newUser.ID
+				models.DB.Create(&user_info) // 传入指针
 
 				Return_json(ctx, "api_ok", nil)
 			}
@@ -77,8 +83,8 @@ func V1_user_api(r *gin.RouterGroup) {
 			user.Name = newUser.Name
 			if models.DB.Where(&user).First(&user).Error == nil {
 				// 有数据
-				fmt.Println(user)
-				fmt.Println(newUser)
+				//fmt.Println(user)
+				//fmt.Println(newUser)
 
 				if user.Pass == newUser.Pass {
 					//成功登录

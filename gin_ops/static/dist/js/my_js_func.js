@@ -65,6 +65,7 @@ function post_json(path, json, callback) {
     })
     .catch((error) => {
       re_data["statusCode"] = -1;
+      re_data["error"]=error;
       callback(re_data);
     });
 }
