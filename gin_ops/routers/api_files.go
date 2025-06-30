@@ -11,20 +11,51 @@ import (
 	"saas/models"
 
 	"github.com/gin-gonic/gin"
+	"github.com/mitchellh/mapstructure"
 )
 
 func V1_file_api(r *gin.RouterGroup) {
 	r.GET("/", func(ctx *gin.Context) {
-		ctx.JSON(http.StatusOK, map[string]interface{}{
-			"error": "you need use Post",
-		})
+		Return_json(ctx, "json_error", nil)
 	})
-	r.POST("/upload", func(ctx *gin.Context) {
+
+	//文件api是一定要登录的，直接用中间件判断登录状态
+	// r.Use(func(ctx *gin.Context) {
+	// 	Use_is_login(ctx)
+	// })
+
+	r.Use(func(ctx *gin.Context) {
+		fmt.Println("file_api")
+		cookie := ctx.PostForm("cookie")
+		var cookie_t models.Cookie
+		if err := mapstructure.Decode(cookie, &cookie_t); err == nil {
+			if cookie_t.Value != "" {
+				cookie_vel := cookie_t.Value
+				fmt.Println(cookie_vel)
+			}
+
+		}
+
+		//fmt.Println(cookie)
 		file, err := ctx.FormFile("file")
 		if err == nil {
-			dst := path.Join("./data/upload", file.Filename)
-			ctx.SaveUploadedFile(file, dst)
+			fmt.Println(file)
+		} else {
+			fmt.Println(err)
 		}
+
+	})
+
+	r.POST("/upload", func(ctx *gin.Context) {
+		//先判断有没有登录
+		//获取中间件处理的结果
+		_, is_login := ctx.Get("user_info")
+		if is_login {
+			Return_json(ctx, "api_ok", nil)
+		} else {
+			Return_json(ctx, "user_no_sign", nil)
+		}
+
 	})
 
 	//接收头像的接口，

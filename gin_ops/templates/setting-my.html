@@ -83,12 +83,14 @@
                   <div class="row g-3">
                     <div class="col-md">
                       <div class="form-label">名字</div>
-                      <input id="username" type="text" class="form-control" value="{{.user_info.Username}}" maxlength="30">
+                      <input id="username" type="text" class="form-control" value="{{.user_info.Username}}"
+                        maxlength="30">
                     </div>
 
                     <div class="col-md">
                       <div class="form-label">备注</div>
-                      <input id="first_name" type="text" class="form-control" value="{{.user_info.FirstName}}" maxlength="50">
+                      <input id="first_name" type="text" class="form-control" value="{{.user_info.FirstName}}"
+                        maxlength="50">
                     </div>
                   </div>
 
@@ -104,10 +106,10 @@
 
 
                 </div>
-                
+
                 <div class="card-footer bg-transparent mt-auto">
                   <div class="btn-list justify-content-end">
-                    
+
                     <a href="#" onclick="updata_user_info()" class="btn btn-primary">
                       提交
                     </a>
@@ -162,7 +164,7 @@
               <img id="preview-img"
                 src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNkYAAAAAYAAjCB0C8AAAAASUVORK5CYII=">
             </div>
-            
+
             <!-- 控制按钮 -->
             <div class="controls">
               <label class="btn btn-primary">
@@ -230,71 +232,92 @@
   /* 头像裁剪器样式*/
 
   .container {
-    width: 95%; /* 改为百分比宽度 */
-    margin: 20px auto; /* 增加上下边距 */
-    max-width: 1200px; /* 保留最大宽度 */
+    width: 95%;
+    /* 改为百分比宽度 */
+    margin: 20px auto;
+    /* 增加上下边距 */
+    max-width: 1200px;
+    /* 保留最大宽度 */
     background: white;
     padding: 30px;
     border-radius: 12px;
-    
+
   }
 
   .flex-wrapper {
     display: flex;
     gap: 30px;
     margin-top: 20px;
-    flex-wrap: wrap; /* 添加换行支持 */
+    flex-wrap: wrap;
+    /* 添加换行支持 */
   }
 
   /* 裁剪区域 */
   .crop-section {
-    flex: 1 1 60%; /* 弹性布局基础宽度 */
-    min-width: 300px; /* 降低最小宽度 */
-    height: auto; /* 移除固定高度 */
-    min-height: 400px; /* 设置最小高度 */
+    flex: 1 1 60%;
+    /* 弹性布局基础宽度 */
+    min-width: 300px;
+    /* 降低最小宽度 */
+    height: auto;
+    /* 移除固定高度 */
+    min-height: 400px;
+    /* 设置最小高度 */
   }
 
   #image-wrapper {
     width: 100%;
-    height: 60vh; /* 改用视窗单位 */
-    max-height: 600px; /* 设置最大高度 */
+    height: 60vh;
+    /* 改用视窗单位 */
+    max-height: 600px;
+    /* 设置最大高度 */
     background: #f8f9fa;
     border: 2px dashed #ddd;
     border-radius: 8px;
     overflow: hidden;
   }
+
   /* 预览区域自适应 */
   .preview-section {
-    flex: 1 1 35%; /* 弹性布局基础宽度 */
-    min-width: 250px; /* 设置合理最小宽度 */
+    flex: 1 1 35%;
+    /* 弹性布局基础宽度 */
+    min-width: 250px;
+    /* 设置合理最小宽度 */
   }
-    /* 移动端适配 */
-    @media (max-width: 768px) {
+
+  /* 移动端适配 */
+  @media (max-width: 768px) {
     .container {
-      padding: 15px; /* 减少内边距 */
+      padding: 15px;
+      /* 减少内边距 */
     }
 
     .flex-wrapper {
-      flex-direction: column; /* 垂直排列 */
+      flex-direction: column;
+      /* 垂直排列 */
     }
 
     .crop-section,
     .preview-section {
-      width: 100% !important; /* 强制全宽 */
-      min-width: unset; /* 移除最小宽度 */
+      width: 100% !important;
+      /* 强制全宽 */
+      min-width: unset;
+      /* 移除最小宽度 */
     }
 
     #image-wrapper {
-      height: 50vh; /* 调整移动端高度 */
+      height: 50vh;
+      /* 调整移动端高度 */
     }
 
     .preview-box {
-      width: 120px; /* 缩小预览区域 */
+      width: 120px;
+      /* 缩小预览区域 */
       height: 120px;
     }
 
     .controls {
-      flex-direction: column; /* 垂直排列按钮 */
+      flex-direction: column;
+      /* 垂直排列按钮 */
       margin-top: 10px;
     }
   }
@@ -519,7 +542,7 @@
     const progressBar = document.querySelector('.progress-bar');
     const progressContainer = document.querySelector('.progress-container');
 
-    try {
+    
       if (!cropper) {
         showMessage('⚠️ 请先选择并裁剪图片', 'error');
         return;
@@ -536,42 +559,23 @@
         canvas.toBlob(resolve, 'image/jpeg', 0.9)
       );
 
-      const formData = new FormData();
-      formData.append('file', blob, `avatar_${Date.now()}.jpg`);
-      formData.append('meta', JSON.stringify({
-        width: canvas.width,
-        height: canvas.height,
-        scale: currentScale.toFixed(2)
-      }));
-
-      const response = await fetch('/api/v1/file/avatar', {
-        method: 'POST',
-        body: formData,
-        headers: {
-          'X-Requested-With': 'XMLHttpRequest'
+      post_file("/upload", blob, `avatar_${Date.now()}.jpg`, (c) => {
+        if (c.statusCode == 200) {
+          if (c.data.err_code == 0) {
+            //save_json("cookie", c.data.return.cookie)
+            banner_alert('success', "更换成功", 950)
+          } else {
+            banner_alert('warning', "服务错误", 3000)
+          }
+        } else {
+          banner_alert('danger', "网络连接错误：" + c.statusCode, 3000)
         }
-      });
+      })
 
-      if (!response.ok) throw new Error(`服务器错误: ${response.status}`);
-
-      const result = await response.json();
-      if (result.err_code == 0) {
-        showMessage(`✅ 上传成功!`, 'success');
-        set_user_avatar(result.data.path);
-        console.log(get_user_avatar());
-        avatar_toolt.hide();
-      } else {
-        showMessage(`❌ 上传失败: ${result.err_msg}`, 'error');
-      }
+     
 
 
-    } catch (error) {
-      console.error('上传错误:', error);
-      showMessage(`❌ 上传失败: ${error.message}`, 'error');
-    } finally {
-      progressBar.style.width = '0%';
-      progressContainer.style.display = 'none';
-    }
+   
   });
 
   // 消息提示
@@ -594,37 +598,37 @@
   //initCropper('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNkYAAAAAYAAjCB0C8AAAAASUVORK5CYII=');
 
   //更新用户资料
-  function updata_user_info(){
+  function updata_user_info() {
     const url = '/api/v1/user/updata_info';
-      const sumt_data = {
-        avatar:get_user_avatar(),
-        username:document.getElementById("username").value,
-        first_name:document.getElementById("first_name").value,
-        birthday:document.getElementById("birthday-picker").value,
-        
+    const sumt_data = {
+      avatar: get_user_avatar(),
+      username: document.getElementById("username").value,
+      first_name: document.getElementById("first_name").value,
+      birthday: document.getElementById("birthday-picker").value,
 
-      };
-      try {
-        const response = axios.post(url, sumt_data, {
-          headers: {
-            'Content-Type': 'application/json'
-          }
-        }).then(response => {
-          //console.log(response)
-          if(response.data.err_code==0){
-            location.reload()
-          }else{
-            console.log(response.data)
-          }
-          
-        });
-      } catch (error) {
-        if (error.response) {
-          // 服务器返回了错误状态码（如 4xx, 5xx）
-          console.error('服务器错误:', error.response.data);
-        } else {
-          console.error('请求未完成:', error.message);
+
+    };
+    try {
+      const response = axios.post(url, sumt_data, {
+        headers: {
+          'Content-Type': 'application/json'
         }
+      }).then(response => {
+        //console.log(response)
+        if (response.data.err_code == 0) {
+          location.reload()
+        } else {
+          console.log(response.data)
+        }
+
+      });
+    } catch (error) {
+      if (error.response) {
+        // 服务器返回了错误状态码（如 4xx, 5xx）
+        console.error('服务器错误:', error.response.data);
+      } else {
+        console.error('请求未完成:', error.message);
       }
+    }
   }
 </script>

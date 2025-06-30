@@ -27,9 +27,51 @@ function load_json(key) {
   }
 }
 
+function post_file(path, file, file_name, callback) {
+  var head_path = "/api/v1/file";
+  // 创建FormData对象
+  const formData = new FormData();
+  formData.append("file", file, file_name); // 'file' 是后端接收文件的字段名
+
+  //获取保存的cookie
+  var cookie = load_json("cookie");
+  //console.log(cookie);
+  formData.append("cookie", JSON.stringify(cookie)); //插入cookie
+
+  var re_data = {};
+
+  // 发送请求
+  axios
+    .post(head_path + path, formData, {
+      headers: {
+        "Content-Type": "multipart/form-data", // 这里实际上可以省略，因为FormData会被正确识别
+      },
+    })
+    .then((response) => {
+      //console.log(response)
+      re_data["statusCode"] = response.status;
+      //载入服务器返回的数据
+      if (response.data) {
+        re_data["data"] = response.data;
+      }
+      //自动保存服务器发送的cookie
+      if (response.cookie) {
+        if (response.cookie.Value == "") {
+          dele("cookie");
+        } else {
+          save_json("cookie", response.cookie);
+        }
+      }
+      callback(re_data);
+    })
+    .catch((error) => {
+      re_data["statusCode"] = -1;
+      re_data["error"] = error;
+      callback(re_data);
+    });
+}
+
 function post_json(path, json, callback) {
-  var host = "";
-  var port = 0;
   var head_path = "/api/v1";
   //把cookie插入json
   var data = {};
@@ -52,20 +94,21 @@ function post_json(path, json, callback) {
       //载入服务器返回的数据
       if (response.data) {
         re_data["data"] = response.data;
-      }
-      //自动保存服务器发送的cookie
-      if (response.cookie) {
-        if (response.cookie.Value == "") {
-          dele("cookie");
-        } else {
-          save_json("cookie", response.cookie);
+        //自动保存服务器发送的cookie
+        if (response.data.cookie) {
+          if (response.data.cookie.Value == "") {
+            dele("cookie");
+          } else {
+            save_json("cookie", response.data.cookie);
+          }
         }
       }
+
       callback(re_data);
     })
     .catch((error) => {
       re_data["statusCode"] = -1;
-      re_data["error"]=error;
+      re_data["error"] = error;
       callback(re_data);
     });
 }

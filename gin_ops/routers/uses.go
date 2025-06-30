@@ -1,7 +1,6 @@
 package routers
 
 import (
-	"fmt"
 	"saas/models"
 	"time"
 
@@ -28,6 +27,7 @@ func Fitst_use(ctx *gin.Context) {
 			}
 
 		}
+
 		var data_t map[string]interface{}
 		if err = mapstructure.Decode(jsonData["data"], &data_t); err == nil {
 			ctx.Set("data", &data_t)
@@ -80,7 +80,7 @@ func Fitst_use(ctx *gin.Context) {
 						models.DB.Create(&user_info) // 传入指针
 					}
 					//写入当前登录的用户信息 传递给下一个组件
-					fmt.Println(user_info)
+					//fmt.Println(user_info)
 					ctx.Set("user_info", &user_info)
 					ctx.Set("user", &user)
 				} else {
@@ -114,5 +114,9 @@ func Fitst_use(ctx *gin.Context) {
 		}
 
 	}
+
+}
+
+func Use_is_login(ctx *gin.Context) {
 
 }
