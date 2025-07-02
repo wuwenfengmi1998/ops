@@ -1,14 +1,13 @@
 package routers
 
 import (
-	"fmt"
 	"saas/models"
 
 	"github.com/gin-gonic/gin"
 	"github.com/mitchellh/mapstructure"
 )
 
-func Api_router(r *gin.RouterGroup) {
+func Router_api(r *gin.RouterGroup) {
 
 	r.GET("/", func(ctx *gin.Context) {
 		Return_json(ctx, "api_ok", nil)
@@ -33,8 +32,6 @@ func Api_router(r *gin.RouterGroup) {
 				ctx.Set("data", &data_t)
 			}
 
-		} else {
-			fmt.Println("jsonerr", err)
 		}
 
 		Use_login_from_cookie(ctx)

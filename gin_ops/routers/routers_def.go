@@ -9,7 +9,7 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-func Def_router(r *gin.RouterGroup) {
+func Router_def(r *gin.RouterGroup) {
 
 	r.Use(func(ctx *gin.Context) {
 		cookie_vel := ""

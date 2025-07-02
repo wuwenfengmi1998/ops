@@ -89,8 +89,9 @@ func main() {
 		ctx.HTML(404, "error_404.html", gin.H{})
 	})
 
-	routers.Def_router(r.Group("/"))     //分组路由传递到def_routers。go
-	routers.Api_router(r.Group("/api/")) //分组路由传递到api_routers。go
+	routers.Router_def(r.Group("/"))
+	routers.Router_api(r.Group("/api/"))
+	routers.Router_file(r.Group("/file/"))
 
 	var http_port = models.Wed_configs.Host + ":" + models.Wed_configs.Port
 	var gin_port = "0.0.0.0" + ":" + models.Wed_configs.Port

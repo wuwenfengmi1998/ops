@@ -28,7 +28,7 @@ function load_json(key) {
 }
 
 function post_file(path, file, file_name, callback) {
-  var head_path = "/api/v1/file";
+  var head_path = "/file";
   // 创建FormData对象
   const formData = new FormData();
   formData.append("file", file, file_name); // 'file' 是后端接收文件的字段名
