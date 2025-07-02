@@ -542,40 +542,68 @@
     const progressBar = document.querySelector('.progress-bar');
     const progressContainer = document.querySelector('.progress-container');
 
-    
-      if (!cropper) {
-        showMessage('⚠️ 请先选择并裁剪图片', 'error');
-        return;
+
+    if (!cropper) {
+      showMessage('⚠️ 请先选择并裁剪图片', 'error');
+      return;
+    }
+
+    progressContainer.style.display = 'block';
+    const canvas = cropper.getCroppedCanvas({
+      width: 1024,
+      height: 1024,
+      imageSmoothingQuality: 'high'
+    });
+
+    const blob = await new Promise(resolve =>
+      canvas.toBlob(resolve, 'image/jpeg', 0.9)
+    );
+
+    // post_file("/upload", blob, `avatar_${Date.now()}.jpg`, (c) => {
+    //   if (c.statusCode == 200) {
+    //     if (c.data.err_code == 0) {
+    //       //save_json("cookie", c.data.return.cookie)
+    //       banner_alert('success', "更换成功", 950)
+    //     } else {
+    //       banner_alert('warning', "服务错误", 3000)
+    //     }
+    //   } else {
+    //     banner_alert('danger', "网络连接错误：" + c.statusCode, 3000)
+    //   }
+    // })
+
+    const formData = new FormData();
+      formData.append('file', blob, `avatar_${Date.now()}.jpg`);
+      formData.append('meta', JSON.stringify({
+        width: canvas.width,
+        height: canvas.height,
+        scale: currentScale.toFixed(2)
+      }));
+
+    const response = await fetch('/api/v1/file/upload', {
+      method: 'POST',
+      body: formData,
+      headers: {
+        'X-Requested-With': 'XMLHttpRequest'
       }
+    });
 
-      progressContainer.style.display = 'block';
-      const canvas = cropper.getCroppedCanvas({
-        width: 1024,
-        height: 1024,
-        imageSmoothingQuality: 'high'
-      });
+    if (!response.ok) throw new Error(`服务器错误: ${response.status}`);
 
-      const blob = await new Promise(resolve =>
-        canvas.toBlob(resolve, 'image/jpeg', 0.9)
-      );
-
-      post_file("/upload", blob, `avatar_${Date.now()}.jpg`, (c) => {
-        if (c.statusCode == 200) {
-          if (c.data.err_code == 0) {
-            //save_json("cookie", c.data.return.cookie)
-            banner_alert('success', "更换成功", 950)
-          } else {
-            banner_alert('warning', "服务错误", 3000)
-          }
-        } else {
-          banner_alert('danger', "网络连接错误：" + c.statusCode, 3000)
-        }
-      })
-
-     
+    const result = await response.json();
+    if (result.err_code == 0) {
+      showMessage(`✅ 上传成功!`, 'success');
+      set_user_avatar(result.data.path);
+      console.log(get_user_avatar());
+      avatar_toolt.hide();
+    } else {
+      showMessage(`❌ 上传失败: ${result.err_msg}`, 'error');
+    }
 
 
-   
+
+
+
   });
 
   // 消息提示

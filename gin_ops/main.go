@@ -89,9 +89,6 @@ func main() {
 		ctx.HTML(404, "error_404.html", gin.H{})
 	})
 
-	r.Use(func(ctx *gin.Context) {
-		routers.Fitst_use(ctx)
-	})
 	routers.Def_router(r.Group("/"))     //分组路由传递到def_routers。go
 	routers.Api_router(r.Group("/api/")) //分组路由传递到api_routers。go
 

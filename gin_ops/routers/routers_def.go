@@ -11,6 +11,23 @@ import (
 
 func Def_router(r *gin.RouterGroup) {
 
+	r.Use(func(ctx *gin.Context) {
+		cookie_vel := ""
+		//读取用户cookie，判断用户是否已登录
+		cookie_s, is_have_cookie := ctx.Cookie("user")
+		if is_have_cookie == nil {
+			cookie_vel = cookie_s
+		}
+
+		//fmt.Println(cookie_vel)
+		if cookie_vel != "" {
+			ctx.Set("cookie_value", cookie_vel)
+
+		}
+
+		Use_login_from_cookie(ctx)
+	})
+
 	//无需权限的页面
 	r.GET("/", func(ctx *gin.Context) {
 		user_info, is_login := ctx.Get("user_info")

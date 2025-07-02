@@ -178,7 +178,7 @@ func V1_user_api(r *gin.RouterGroup) {
 			}
 
 		} else {
-			//ctx.SetCookie("user", "", -1, "/", models.Wed_configs.Host, models.Wed_configs.Tls, true)
+			ctx.SetCookie("user", "", -1, "/", models.Wed_configs.Host, models.Wed_configs.Tls, true)
 			Return_json(ctx, "user_no_sign", nil)
 		}
 

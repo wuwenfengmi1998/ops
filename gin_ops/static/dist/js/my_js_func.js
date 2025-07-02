@@ -36,17 +36,16 @@ function post_file(path, file, file_name, callback) {
   //获取保存的cookie
   var cookie = load_json("cookie");
   //console.log(cookie);
-  formData.append("cookie", JSON.stringify(cookie)); //插入cookie
+  if(cookie){
+    formData.append("cookie", cookie.Value); //插入cookie
+  }
+  
 
   var re_data = {};
 
   // 发送请求
   axios
-    .post(head_path + path, formData, {
-      headers: {
-        "Content-Type": "multipart/form-data", // 这里实际上可以省略，因为FormData会被正确识别
-      },
-    })
+    .post(head_path + path, formData)
     .then((response) => {
       //console.log(response)
       re_data["statusCode"] = response.status;
