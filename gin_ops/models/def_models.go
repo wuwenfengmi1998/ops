@@ -100,7 +100,7 @@ func Md5_str(str string) string {
 }
 
 func Hash_user_pass(str string) string {
-	switch User_configs["pass_hash_type"].(string) {
+	switch Configs_user.Pass_hash_type {
 	case "text":
 		return str
 	case "md5":

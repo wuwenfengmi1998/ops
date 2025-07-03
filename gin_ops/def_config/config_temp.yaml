@@ -17,9 +17,44 @@ database:
 user:
   cookie_timeout: 604800
   pass_hash_type: "md5" #密码哈希类型 text md5 
-  def_avatar_save_path: "/data/avatar/" #头像保存的真实位置
-  def_avatar_ginrouter_path: "/avatar/" #gin 路由的路径
-  def_avatar_path: "/static/avatars/def.png"
+  avatar_save_path: "/data/avatar/" #头像保存的真实位置
+  avatar_ginrouter_path: "/avatar/" #gin 路由的路径
+  avatar_path: "/static/avatars/def.png"
+
+file:
+  max_size_mb: 50
+  pahts:
+  - "./data/avatar/"
+  - "./data/upload/image/"
+  - "./data/upload/video/"
+  - "./data/upload/music/"
+  - "./data/upload/pdf/"
+  - "./data/upload/other/"
+
+  allow_image_mime:
+  - image/jpeg: true
+  - image/png: true
+  - image/gif: true
+  - image/bmp: true
+
+  allow_video_mime:
+  - video/mp4: true
+  - video/x-msvideo: true
+  - video/quicktime: true
+  - video/x-flv: true
+  - video/mpeg: true
+
+  allow_music_mime:
+  - audio/mpeg: true
+  - audio/aac: true
+  - audio/wav: true
+  - audio/flac: true
+
+  allow_pdf_mime:
+  - application/pdf: true
+
+
+
 
 warehouses:
   repos_per_page: 12      #每页显示多少个仓库

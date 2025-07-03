@@ -47,7 +47,7 @@ func V1_user_api(r *gin.RouterGroup) {
 
 				//创建info
 				var user_info models.User_info
-				user_info.AvatarPath = models.User_configs["def_avatar_path"].(string)
+				user_info.AvatarPath = models.Configs_user.Avatar_path
 				user_info.UserID = newUser.ID
 				models.DB.Create(&user_info) // 传入指针
 
@@ -91,7 +91,7 @@ func V1_user_api(r *gin.RouterGroup) {
 					//cookie时间
 					var cookie_time = 0
 					if jsonData.Is_keep_login {
-						cookie_time = models.User_configs["cookie_timeout"].(int)
+						cookie_time = models.Configs_user.Cookie_timeout
 					}
 
 					cookie := models.Rand_str_32() //生成32字节cookie
@@ -99,7 +99,7 @@ func V1_user_api(r *gin.RouterGroup) {
 					//fmt.Println(cookie)
 					//将cookie写进数据库
 					new_cookie := models.Cookie{}
-					new_cookie.Domain = models.Wed_configs.Host
+					new_cookie.Domain = models.Configs_wed.Host
 					new_cookie.Name = "user"
 					new_cookie.Value = cookie
 					new_cookie.UserID = user.ID
@@ -108,11 +108,11 @@ func V1_user_api(r *gin.RouterGroup) {
 					new_cookie.CreatedAt = time.Now()
 					new_cookie.UpdatedAt = new_cookie.CreatedAt
 					//计算cookie失效时间
-					new_cookie.ExpiresAt = time.Now().Add(time.Duration(models.User_configs["cookie_timeout"].(int)) * time.Second) //计算过期时间
-					new_cookie.SecureFlag = models.Wed_configs.Tls
+					new_cookie.ExpiresAt = time.Now().Add(time.Duration(models.Configs_user.Cookie_timeout) * time.Second) //计算过期时间
+					new_cookie.SecureFlag = models.Configs_wed.Tls
 
 					//发送到前端
-					ctx.SetCookie("user", cookie, cookie_time, "/", models.Wed_configs.Host, models.Wed_configs.Tls, true)
+					ctx.SetCookie("user", cookie, cookie_time, "/", models.Configs_wed.Host, models.Configs_wed.Tls, true)
 					ctx.Set("cookie", new_cookie)
 					//写到数据库
 					models.DB.Create(&new_cookie) // 传入指针
@@ -167,7 +167,7 @@ func V1_user_api(r *gin.RouterGroup) {
 			if err := mapstructure.Decode(cookie_any, &cookie); err == nil {
 				models.DB.Where(&cookie).Delete(&cookie)
 				//删除前端cookie
-				ctx.SetCookie("user", "", -1, "/", models.Wed_configs.Host, models.Wed_configs.Tls, true)
+				ctx.SetCookie("user", "", -1, "/", models.Configs_wed.Host, models.Configs_wed.Tls, true)
 				ctx.Set("cookie", nil)
 
 				Return_json(ctx, "api_ok", nil)
@@ -178,7 +178,7 @@ func V1_user_api(r *gin.RouterGroup) {
 			}
 
 		} else {
-			ctx.SetCookie("user", "", -1, "/", models.Wed_configs.Host, models.Wed_configs.Tls, true)
+			ctx.SetCookie("user", "", -1, "/", models.Configs_wed.Host, models.Configs_wed.Tls, true)
 			Return_json(ctx, "user_no_sign", nil)
 		}
 
@@ -211,10 +211,10 @@ func V1_user_api(r *gin.RouterGroup) {
 				}
 
 				//需要验证传入数据的合法性 例如头像url是否站内的
-				if strings.HasPrefix(new_user_info.AvatarPath, models.User_configs["def_avatar_ginrouter_path"].(string)) {
+				if strings.HasPrefix(new_user_info.AvatarPath, models.Configs_user.Avatar_ginrouter_path) {
 
 				} else {
-					new_user_info.AvatarPath = models.User_configs["def_avatar_path"].(string)
+					new_user_info.AvatarPath = models.Configs_user.Avatar_path
 				}
 
 				//fmt.Printf("%%#v: %#v\n", new_user_info)

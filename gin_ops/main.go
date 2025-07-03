@@ -16,22 +16,17 @@ func init() {
 
 func main() {
 	fmt.Println("main_init!")
-	data_path := "./data/upload/"
-	avatar_path := "./data/avatar/"
+
 	config_file_path := "./data/config.yaml"
 	config_temp_path := "./def_config/config_temp.yaml"
 	// 直接尝试创建所有必要的目录
-	err := os.MkdirAll(data_path, 0755)
+	err := os.MkdirAll("./data", 0755)
 	if err != nil {
 		fmt.Printf("创建文件夹失败: %v\n", err)
-		return
+		panic("创建文件夹失败")
+
 	}
-	err = os.MkdirAll(avatar_path, 0755)
-	if err != nil {
-		fmt.Printf("创建文件夹失败: %v\n", err)
-		return
-	}
-	//fmt.Println("文件夹创建成功或已存在")
+
 	//尝试读取配置
 	if !models.File_exists(config_file_path) {
 		fmt.Println("读取配置失败")
@@ -40,32 +35,33 @@ func main() {
 		fmt.Println("复制配置模板")
 		input, err := os.ReadFile(config_temp_path)
 		if err != nil {
-			fmt.Println(err)
-			return
+			panic(err)
+
 		}
 		err = os.WriteFile(config_file_path, input, 0644)
 		if err != nil {
-			fmt.Println(err)
-			return
+			panic(err)
+
 		}
 		fmt.Printf("需要修改此配置:%s\n", config_file_path)
-		return
+
 	}
+
 	//读取默认配置
 	data, err := os.ReadFile(config_file_path)
 	if err != nil {
-		fmt.Println(err)
-		return
+		panic(err)
+
 	}
 
 	if err := yaml.Unmarshal(data, &models.Configs); err != nil {
-		fmt.Println(err)
-		return
+		panic(err)
+
 	}
 
 	if models.Configs["configed"] == false {
 		fmt.Printf("需要将:%s 内的configed设置为true", config_file_path)
-		return
+		panic("need config")
 	}
 
 	//统一初始化
@@ -81,7 +77,7 @@ func main() {
 	r.Static("/dist/", "./static/dist/")
 
 	//静态用户上传的文件
-	r.Static("/avatar/", avatar_path)
+	r.Static("/avatar/", models.Configs_file.Pahts[0])
 	//store := cookie.NewStore([]byte("secret"))
 
 	// 自定义 404 页面（需要提前加载模板）
@@ -93,15 +89,15 @@ func main() {
 	routers.Router_api(r.Group("/api/"))
 	routers.Router_file(r.Group("/file/"))
 
-	var http_port = models.Wed_configs.Host + ":" + models.Wed_configs.Port
-	var gin_port = "0.0.0.0" + ":" + models.Wed_configs.Port
-	if models.Wed_configs.Tls {
-		if models.Wed_configs.Cert_public_path == "" || models.Wed_configs.Cert_private_path == "" {
+	var http_port = models.Configs_wed.Host + ":" + models.Configs_wed.Port
+	var gin_port = "0.0.0.0" + ":" + models.Configs_wed.Port
+	if models.Configs_wed.Tls {
+		if models.Configs_wed.Cert_public_path == "" || models.Configs_wed.Cert_private_path == "" {
 			fmt.Printf("需要配置证书路径")
 			return
 		} else {
 			fmt.Println("https://" + http_port)
-			r.RunTLS(gin_port, models.Wed_configs.Cert_public_path, models.Wed_configs.Cert_private_path)
+			r.RunTLS(gin_port, models.Configs_wed.Cert_public_path, models.Configs_wed.Cert_private_path)
 		}
 	} else {
 		fmt.Println("http://" + http_port)

@@ -27,10 +27,10 @@ func Use_login_from_cookie(ctx *gin.Context) {
 				//每次调用都更新cookie的最新状态 ，用于计算在线
 				var cookie_up models.Cookie
 				cookie_up.UpdatedAt = time.Now()
-				cookie_up.ExpiresAt = time.Now().Add(time.Duration(models.User_configs["cookie_timeout"].(int)) * time.Second) //计算过期时间
+				cookie_up.ExpiresAt = time.Now().Add(time.Duration(models.Configs_user.Cookie_timeout) * time.Second) //计算过期时间
 				models.DB.Model(&models.Cookie{}).Where(&cookie).Updates(&cookie_up)
 				//更新前端cookie
-				ctx.SetCookie("user", cookie.Value, models.User_configs["cookie_timeout"].(int), "/", models.Wed_configs.Host, models.Wed_configs.Tls, true)
+				ctx.SetCookie("user", cookie.Value, models.Configs_user.Cookie_timeout, "/", models.Configs_wed.Host, models.Configs_wed.Tls, true)
 				cookie.UpdatedAt = cookie_up.UpdatedAt
 				cookie.ExpiresAt = cookie_up.ExpiresAt
 				ctx.Set("cookie", cookie)
@@ -52,7 +52,7 @@ func Use_login_from_cookie(ctx *gin.Context) {
 					} else {
 						// 无数据
 						//创建一个默认info
-						user_info.AvatarPath = models.User_configs["def_avatar_path"].(string)
+						user_info.AvatarPath = models.Configs_user.Avatar_path
 						user_info.UserID = cookie.UserID
 						models.DB.Create(&user_info) // 传入指针
 					}
@@ -63,7 +63,7 @@ func Use_login_from_cookie(ctx *gin.Context) {
 				} else {
 					//找不到登录权限？？ 可能被封号？
 					//删除前端cookie
-					ctx.SetCookie("user", "", -1, "/", models.Wed_configs.Host, models.Wed_configs.Tls, true)
+					ctx.SetCookie("user", "", -1, "/", models.Configs_wed.Host, models.Configs_wed.Tls, true)
 					cookie.Value = ""
 					cookie.ExpiresAt = time.Now()
 					ctx.Set("cookie", cookie)
@@ -75,7 +75,7 @@ func Use_login_from_cookie(ctx *gin.Context) {
 				//删除数据库的cookie
 				models.DB.Delete(&cookie)
 				//删除前端cookie
-				ctx.SetCookie("user", "", -1, "/", models.Wed_configs.Host, models.Wed_configs.Tls, true)
+				ctx.SetCookie("user", "", -1, "/", models.Configs_wed.Host, models.Configs_wed.Tls, true)
 				cookie.Value = ""
 				cookie.ExpiresAt = time.Now()
 				ctx.Set("cookie", cookie)
@@ -84,7 +84,7 @@ func Use_login_from_cookie(ctx *gin.Context) {
 		} else {
 			//找不到cookie，未登录
 			//删除前端cookie
-			ctx.SetCookie("user", "", -1, "/", models.Wed_configs.Host, models.Wed_configs.Tls, true)
+			ctx.SetCookie("user", "", -1, "/", models.Configs_wed.Host, models.Configs_wed.Tls, true)
 			cookie.Value = ""
 			cookie.ExpiresAt = time.Now()
 			ctx.Set("cookie", cookie)

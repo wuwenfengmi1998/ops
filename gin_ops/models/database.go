@@ -139,7 +139,7 @@ func init() {
 
 }
 
-func Database_init() {
+func Init_database() {
 
 	fmt.Println("database_init")
 	//var database_config map[string]interface{}=Configs["database"]

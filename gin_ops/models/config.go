@@ -1,14 +1,19 @@
 package models
 
-import "github.com/mitchellh/mapstructure"
+import (
+	"fmt"
+	"os"
+
+	"github.com/mitchellh/mapstructure"
+)
 
 var Configs map[string]interface{}
 
-var Wed_configs Wed_configs_t
+var Configs_wed Configs_web_t
+var Configs_user Configs_user_t
+var Configs_file Configs_file_t
 
 var Database_configs map[string]interface{}
-
-var User_configs map[string]interface{}
 
 var Allowed_avatar_ext = map[string]bool{
 	".jpg":  true,
@@ -26,17 +31,35 @@ func init() {
 }
 
 func All_config_init() {
-	//读取web配置
 
-	err := mapstructure.Decode(Configs["web"].(map[string]interface{}), &Wed_configs)
+	//初始化数据库
+	Init_database()
+
+	//读取web配置
+	err := mapstructure.Decode(Configs["web"].(map[string]interface{}), &Configs_wed)
 	if err != nil {
 		panic(err)
 	}
 
-	//初始化数据库
-	Database_init()
-
 	//初始化user config
-	User_configs = Configs["user"].(map[string]interface{})
+	err = mapstructure.Decode(Configs["user"].(map[string]interface{}), &Configs_user)
+	if err != nil {
+		panic(err)
+	}
+
+	//初始化file config
+	err = mapstructure.Decode(Configs["file"].(map[string]interface{}), &Configs_file)
+	if err != nil {
+		panic(err)
+	}
+	//创建file的关键文件夹
+	for _, value := range Configs_file.Pahts {
+		err := os.MkdirAll(value, 0755)
+		if err != nil {
+			fmt.Printf("创建文件夹失败: %v\n", err)
+			panic("创建文件夹失败")
+
+		}
+	}
 
 }
