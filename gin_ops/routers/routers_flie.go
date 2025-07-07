@@ -33,7 +33,7 @@ func Router_file(r *gin.RouterGroup) {
 	upload := r.Group("/upload") //定义上传组
 	//4大媒体上传接口，严格判断文件类型，可以直接被前端引用
 	upload.POST("/image", func(ctx *gin.Context) {
-
+		Return_json(ctx, "api_ok", nil)
 	})
 	upload.POST("/video", func(ctx *gin.Context) {
 
