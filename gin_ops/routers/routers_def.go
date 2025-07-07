@@ -185,7 +185,7 @@ func Router_def(r *gin.RouterGroup) {
 		user_info, is_login := ctx.Get("user_info")
 
 		//判断是否登录
-		if is_login == true {
+		if is_login {
 
 			ctx.HTML(http.StatusOK, "setting-my.html", gin.H{
 				"is_login":  is_login,
@@ -201,7 +201,7 @@ func Router_def(r *gin.RouterGroup) {
 		user_info, is_login := ctx.Get("user_info")
 		user, _ := ctx.Get("user")
 		//判断是否登录
-		if is_login == true {
+		if is_login {
 
 			ctx.HTML(http.StatusOK, "setting-security.html", gin.H{
 				"is_login":  is_login,

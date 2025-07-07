@@ -159,7 +159,7 @@ func V1_user_api(r *gin.RouterGroup) {
 		_, is_login := ctx.Get("user_info")
 		//fmt.Println(is_login)
 		//fmt.Println(user_info)
-		if is_login == true {
+		if is_login {
 			//fmt.Println("loged")
 			cookie_any, _ := ctx.Get("cookie") //这个cookie在中间件已经判断为有效的，否则is_login不可能为true，所以直接在数据库删除应该是安全的
 			//删除数据库里的cookie
