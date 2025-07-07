@@ -52,6 +52,10 @@ func All_config_init() {
 	if err != nil {
 		panic(err)
 	}
+
+	//fmt.Println(Configs_file)
+	//fmt.Println(Allowed_avatar_mime)
+
 	//创建file的关键文件夹
 	for _, value := range Configs_file.Pahts {
 		err := os.MkdirAll(value, 0755)

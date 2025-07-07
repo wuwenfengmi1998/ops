@@ -562,13 +562,17 @@
     post_file("/image", blob, `avatar_${Date.now()}.jpg`, (c) => {
       if (c.statusCode == 200) {
         if (c.data.err_code == 0) {
-          //save_json("cookie", c.data.return.cookie)
-          banner_alert('success', "更换成功", 950)
+          
+          //banner_alert('success', "更换成功", 950)
+          showMessage(`✅ 上传成功!`, 'success');
+          //avatar_toolt.hide();
         } else {
-          banner_alert('warning', "服务错误", 3000)
+          showMessage(`❌ 上传失败:`+c.data.err_msg, 'error');
+          //banner_alert('warning', "服务错误", 3000)
         }
       } else {
-        banner_alert('danger', "网络连接错误：" + c.statusCode, 3000)
+        //banner_alert('danger', "网络连接错误：" + c.statusCode, 3000)
+        showMessage(`❌ 网络连接错误:`+c.statusCode, 'error');
       }
     })
 

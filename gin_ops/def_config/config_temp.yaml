@@ -22,7 +22,7 @@ user:
   avatar_path: "/static/avatars/def.png"
 
 file:
-  max_size_mb: 50
+  max_size: 52428800
   pahts:
   - "./data/avatar/"
   - "./data/upload/image/"
@@ -32,26 +32,26 @@ file:
   - "./data/upload/other/"
 
   allow_image_mime:
-  - image/jpeg: true
-  - image/png: true
-  - image/gif: true
-  - image/bmp: true
+    image/jpeg: true
+    image/png: true
+    image/gif: true
+    image/bmp: true
 
   allow_video_mime:
-  - video/mp4: true
-  - video/x-msvideo: true
-  - video/quicktime: true
-  - video/x-flv: true
-  - video/mpeg: true
+    video/mp4: true
+    video/x-msvideo: true
+    video/quicktime: true
+    video/x-flv: true
+    video/mpeg: true
 
   allow_music_mime:
-  - audio/mpeg: true
-  - audio/aac: true
-  - audio/wav: true
-  - audio/flac: true
+    audio/mpeg: true
+    audio/aac: true
+    audio/wav: true
+    audio/flac: true
 
   allow_pdf_mime:
-  - application/pdf: true
+    application/pdf: true
 
 
 

@@ -17,10 +17,10 @@ type Configs_user_t struct {
 }
 
 type Configs_file_t struct {
-	Max_size_mb      uint              `mapstructure:"max_size_mb"`
-	Pahts            []string          `mapstructure:"pahts"`
-	Allow_image_mime []map[string]bool `mapstructure:"allow_image_mime"`
-	Allow_video_mime []map[string]bool `mapstructure:"allow_video_mime"`
-	Allow_music_mime []map[string]bool `mapstructure:"allow_music_mime"`
-	Allow_pdf_mime   []map[string]bool `mapstructure:"allow_pdf_mime"`
+	Max_size         uint64          `mapstructure:"max_size"`
+	Pahts            []string        `mapstructure:"pahts"`
+	Allow_image_mime map[string]bool `mapstructure:"allow_image_mime"`
+	Allow_video_mime map[string]bool `mapstructure:"allow_video_mime"`
+	Allow_music_mime map[string]bool `mapstructure:"allow_music_mime"`
+	Allow_pdf_mime   map[string]bool `mapstructure:"allow_pdf_mime"`
 }
