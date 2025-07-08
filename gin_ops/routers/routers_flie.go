@@ -41,7 +41,7 @@ func Router_file(r *gin.RouterGroup) {
 		//先判断有没有登录
 		user_info_any, is_login := ctx.Get("user_info") //因为需要读取user_info，避免重复调用 这一步就不在中间件操作了
 		if is_login {
-			user_info := user_info_any.(models.User_info) //直接断言类型，这个值是从数据库直接读取的 理论不会出错
+			user_info := user_info_any.(*models.User_info) //直接断言类型，这个值是从数据库直接读取的 理论不会出错
 			file, err := ctx.FormFile("file")
 			if err == nil {
 
@@ -75,11 +75,13 @@ func Router_file(r *gin.RouterGroup) {
 							hashBytes := hasher.Sum(nil)
 							hashString := hex.EncodeToString(hashBytes)
 
-							new_filename := fmt.Sprintf("%d_%s", user_info.UserID, hashString)
+							new_filename := fmt.Sprintf("%s", hashString)
 							file.Filename = new_filename
 
+							fmt.Println(user_info)
+
 							//这是上传的真实路径
-							dst := path.Join("./data/avatar", file.Filename)
+							dst := path.Join(models.Configs_file.Pahts["image"], file.Filename)
 
 							//判断文件是否存在避免重复保存
 							if models.File_exists(dst) {

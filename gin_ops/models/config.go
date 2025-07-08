@@ -15,16 +15,7 @@ var Configs_file Configs_file_t
 
 var Database_configs map[string]interface{}
 
-var Allowed_avatar_ext = map[string]bool{
-	".jpg":  true,
-	".jpeg": true,
-	".png":  true,
-}
 
-var Allowed_avatar_mime = map[string]bool{
-	"image/jpeg": true,
-	"image/png":  true,
-}
 
 func init() {
 
