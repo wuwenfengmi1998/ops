@@ -9,6 +9,7 @@ import (
 	"io"
 	"net/http"
 	"path"
+	"path/filepath"
 	"saas/models"
 
 	"github.com/gin-gonic/gin"
@@ -49,7 +50,8 @@ func Router_file(r *gin.RouterGroup) {
 				if file.Size > 512 {
 					if file.Size < int64(models.Configs_file.Max_size) {
 						// 2. 安全获取文件名并处理路径问题
-						//filename := filepath.Base(file.Filename) // 防御性处理路径分隔符
+						filename := filepath.Base(file.Filename) // 防御性处理路径分隔符
+						//fmt.Println(filename)
 						// 3. 获取标准后缀名（含点）
 						//extWithDot := filepath.Ext(filename)
 
@@ -62,7 +64,8 @@ func Router_file(r *gin.RouterGroup) {
 						io.ReadFull(src_mime, buffer)
 						// 检测MIME类型
 						mimeType := http.DetectContentType(buffer)
-						if models.Configs_file.Allow_image_mime[mimeType] {
+						file_extname := models.Configs_file.Allow_image_mime[mimeType]
+						if file_extname != "" {
 							// 打开文件流
 							src, _ := file.Open()
 							defer src.Close()
@@ -75,10 +78,10 @@ func Router_file(r *gin.RouterGroup) {
 							hashBytes := hasher.Sum(nil)
 							hashString := hex.EncodeToString(hashBytes)
 
-							new_filename := fmt.Sprintf("%s", hashString)
+							new_filename := fmt.Sprintf("%s%s", hashString, file_extname)
 							file.Filename = new_filename
 
-							fmt.Println(user_info)
+							//fmt.Println(user_info)
 
 							//这是上传的真实路径
 							dst := path.Join(models.Configs_file.Pahts["image"], file.Filename)
@@ -87,19 +90,47 @@ func Router_file(r *gin.RouterGroup) {
 							if models.File_exists(dst) {
 								//fmt.Println("文件存在")
 
-								Return_json(ctx, "api_ok", nil)
 							} else {
 								//fmt.Println("文件no存在")
 								ferr := ctx.SaveUploadedFile(file, dst)
 								if ferr == nil {
 									//文件保存成功
 
-									Return_json(ctx, "api_ok", nil)
 								} else {
 
 									Return_json(ctx, "file_save_err", nil)
+									ctx.Abort() //end
 								}
 							}
+							//记录到数据库
+
+							//先检查数据库有没有数据
+							fund_file_info := models.File_info{
+								Name:   filename,
+								Sha256: hashString,
+								Mime:   mimeType,
+								Type:   "image",
+								UserID: user_info.UserID,
+							}
+							fund_file_info2 := models.File_info{}
+
+							models.DB.Where(&fund_file_info).Find(&fund_file_info2)
+
+							if fund_file_info2.ID != 0 {
+								fmt.Println(fund_file_info2)
+								fund_file_info2.Const += 1
+								models.DB.Where(&fund_file_info).Updates(&fund_file_info2)
+							} else {
+								models.DB.Create(&fund_file_info) // 传入指针
+								fund_file_info2 = fund_file_info
+							}
+
+							red := map[string]interface{}{
+								"data": fund_file_info2,
+							}
+
+							Return_json(ctx, "api_ok", red)
+
 						} else {
 
 							Return_json(ctx, "file_mime_err", nil)

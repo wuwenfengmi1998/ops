@@ -559,7 +559,7 @@
       canvas.toBlob(resolve, 'image/png', 0.9)
     );
 
-    post_file("/image", blob, `avatar_${Date.now()}.jpg`, (c) => {
+    post_file("/image", blob, `avatar.png`, (c) => {
       if (c.statusCode == 200) {
         if (c.data.err_code == 0) {
           
