@@ -11,6 +11,7 @@ import (
 	"path"
 	"path/filepath"
 	"saas/models"
+	"strconv"
 
 	"github.com/gin-gonic/gin"
 )
@@ -18,7 +19,22 @@ import (
 func Router_file(r *gin.RouterGroup) {
 
 	//无需权限，可以直接下载的接口
-	r.GET("/download/:id", func(ctx *gin.Context) {
+	r.GET("/download/id/:id", func(ctx *gin.Context) {
+		id := ctx.Param("id")
+		id_int, err := strconv.ParseInt(id, 10, 0)
+		if err == nil {
+			//fmt.Println(id_int)
+			file_info := models.File_info{}
+			models.DB.Where("ID = ?", id_int).First(&file_info)
+
+			fmt.Println(file_info)
+
+			Return_json(ctx, "api_ok", map[string]interface{}{
+				"data": file_info,
+			})
+		} else {
+			Return_json(ctx, "file_id_error", nil)
+		}
 
 	})
 
