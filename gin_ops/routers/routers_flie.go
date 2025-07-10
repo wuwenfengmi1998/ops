@@ -27,9 +27,11 @@ func Router_file(r *gin.RouterGroup) {
 			file_info := models.File_info{
 				ID: uint(id_int),
 			}
-			models.DB.Where(file_info.ID).First(&file_info)
-
-			fmt.Println(file_info)
+			if models.DB.Where(file_info.ID).First(&file_info).Error == nil {
+				fmt.Println(file_info)
+			} else {
+				fmt.Println("not fund")
+			}
 
 			Return_json(ctx, "api_ok", map[string]interface{}{
 				"data": file_info,

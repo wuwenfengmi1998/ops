@@ -38,7 +38,7 @@ func V1_user_api(r *gin.RouterGroup) {
 			var user models.User
 			user.Name = newUser.Name
 
-			if models.DB.Where(&user).First(&user).Error == nil {
+			if models.DB.Where(user.Name).First(&user).Error == nil {
 				//fmt.Println("找到用户:", user.ID)
 				Return_json(ctx, "user_name_dup", nil)
 			} else {
@@ -80,7 +80,7 @@ func V1_user_api(r *gin.RouterGroup) {
 
 			var user models.User
 			user.Name = newUser.Name
-			if models.DB.Where(&user).First(&user).Error == nil {
+			if models.DB.Where(user.Name).First(&user).Error == nil {
 				// 有数据
 				//fmt.Println(user)
 				//fmt.Println(newUser)
@@ -122,7 +122,7 @@ func V1_user_api(r *gin.RouterGroup) {
 						UserID: user.ID,
 					}
 
-					models.DB.Where(&user_info).First(&user_info)
+					models.DB.Where(user_info.UserID).First(&user_info)
 
 					red := map[string]interface{}{
 						"cookie":    new_cookie,
