@@ -19,6 +19,31 @@ import (
 func Router_file(r *gin.RouterGroup) {
 
 	//无需权限，可以直接下载的接口
+	r.GET("/preview/id/:id", func(ctx *gin.Context) {
+		id := ctx.Param("id")
+		id_int, err := strconv.ParseInt(id, 10, 0)
+		if err == nil {
+			if id_int != 0 {
+				//fmt.Println(id_int)
+				file_info := models.File_info{
+					ID: uint(id_int),
+				}
+				if models.DB.Where(&file_info).First(&file_info).Error == nil {
+					Return_file(ctx, &file_info, true)
+				} else {
+					//fmt.Println("not fund")
+					Return_json(ctx, "file_not_fund", nil)
+				}
+
+			} else {
+				Return_json(ctx, "file_id_error", nil)
+			}
+
+		} else {
+			Return_json(ctx, "file_id_error", nil)
+		}
+
+	})
 	r.GET("/download/id/:id", func(ctx *gin.Context) {
 		id := ctx.Param("id")
 		id_int, err := strconv.ParseInt(id, 10, 0)
@@ -29,14 +54,12 @@ func Router_file(r *gin.RouterGroup) {
 					ID: uint(id_int),
 				}
 				if models.DB.Where(&file_info).First(&file_info).Error == nil {
-					fmt.Println(file_info)
+					Return_file(ctx, &file_info, false)
 				} else {
-					fmt.Println("not fund")
+					//fmt.Println("not fund")
+					Return_json(ctx, "file_not_fund", nil)
 				}
 
-				Return_json(ctx, "api_ok", map[string]interface{}{
-					"data": file_info,
-				})
 			} else {
 				Return_json(ctx, "file_id_error", nil)
 			}
@@ -148,6 +171,7 @@ func Router_file(r *gin.RouterGroup) {
 									fund_file_info2.Const += 1
 									models.DB.Where(&fund_file_info).Updates(&fund_file_info2)
 								} else {
+									fund_file_info.Path = dst
 									models.DB.Create(&fund_file_info) // 传入指针
 									fund_file_info2 = fund_file_info
 								}
