@@ -23,19 +23,24 @@ func Router_file(r *gin.RouterGroup) {
 		id := ctx.Param("id")
 		id_int, err := strconv.ParseInt(id, 10, 0)
 		if err == nil {
-			//fmt.Println(id_int)
-			file_info := models.File_info{
-				ID: uint(id_int),
-			}
-			if models.DB.Where(file_info.ID).First(&file_info).Error == nil {
-				fmt.Println(file_info)
+			if id_int != 0 {
+				//fmt.Println(id_int)
+				file_info := models.File_info{
+					ID: uint(id_int),
+				}
+				if models.DB.Where(&file_info).First(&file_info).Error == nil {
+					fmt.Println(file_info)
+				} else {
+					fmt.Println("not fund")
+				}
+
+				Return_json(ctx, "api_ok", map[string]interface{}{
+					"data": file_info,
+				})
 			} else {
-				fmt.Println("not fund")
+				Return_json(ctx, "file_id_error", nil)
 			}
 
-			Return_json(ctx, "api_ok", map[string]interface{}{
-				"data": file_info,
-			})
 		} else {
 			Return_json(ctx, "file_id_error", nil)
 		}
@@ -66,104 +71,111 @@ func Router_file(r *gin.RouterGroup) {
 			file, err := ctx.FormFile("file")
 			if err == nil {
 
-				//限制文件大小
-				if file.Size > 512 {
-					if file.Size < int64(models.Configs_file.Max_size) {
-						// 2. 安全获取文件名并处理路径问题
-						filename := filepath.Base(file.Filename) // 防御性处理路径分隔符
-						//fmt.Println(filename)
-						// 3. 获取标准后缀名（含点）
-						//extWithDot := filepath.Ext(filename)
+				if file.Filename != "" {
 
-						//判断文件mime是否合法
-						// 打开文件流
-						src_mime, _ := file.Open()
-						defer src_mime.Close()
-						// 读取前512字节用于MIME检测
-						buffer := make([]byte, 512)
-						io.ReadFull(src_mime, buffer)
-						// 检测MIME类型
-						mimeType := http.DetectContentType(buffer)
-						file_extname := models.Configs_file.Allow_image_mime[mimeType]
-						if file_extname != "" {
+					//限制文件大小
+					if file.Size > 512 {
+						if file.Size < int64(models.Configs_file.Max_size) {
+							// 2. 安全获取文件名并处理路径问题
+							filename := filepath.Base(file.Filename) // 防御性处理路径分隔符
+							//fmt.Println(filename)
+							// 3. 获取标准后缀名（含点）
+							//extWithDot := filepath.Ext(filename)
+
+							//判断文件mime是否合法
 							// 打开文件流
-							src, _ := file.Open()
-							defer src.Close()
-							// 创建SHA256哈希器
-							hasher := sha256.New()
+							src_mime, _ := file.Open()
+							defer src_mime.Close()
+							// 读取前512字节用于MIME检测
+							buffer := make([]byte, 512)
+							io.ReadFull(src_mime, buffer)
+							// 检测MIME类型
+							mimeType := http.DetectContentType(buffer)
+							file_extname := models.Configs_file.Allow_image_mime[mimeType]
+							if file_extname != "" {
+								// 打开文件流
+								src, _ := file.Open()
+								defer src.Close()
+								// 创建SHA256哈希器
+								hasher := sha256.New()
 
-							// 计算哈希值
-							io.Copy(hasher, src)
-							// 获取哈希结果
-							hashBytes := hasher.Sum(nil)
-							hashString := hex.EncodeToString(hashBytes)
+								// 计算哈希值
+								io.Copy(hasher, src)
+								// 获取哈希结果
+								hashBytes := hasher.Sum(nil)
+								hashString := hex.EncodeToString(hashBytes)
 
-							new_filename := fmt.Sprintf("%s%s", hashString, file_extname)
-							file.Filename = new_filename
+								new_filename := fmt.Sprintf("%s%s", hashString, file_extname)
+								file.Filename = new_filename
 
-							//fmt.Println(user_info)
+								//fmt.Println(user_info)
 
-							//这是上传的真实路径
-							dst := path.Join(models.Configs_file.Pahts["image"], file.Filename)
+								//这是上传的真实路径
+								dst := path.Join(models.Configs_file.Pahts["image"], file.Filename)
 
-							//判断文件是否存在避免重复保存
-							if models.File_exists(dst) {
-								//fmt.Println("文件存在")
-
-							} else {
-								//fmt.Println("文件no存在")
-								ferr := ctx.SaveUploadedFile(file, dst)
-								if ferr == nil {
-									//文件保存成功
+								//判断文件是否存在避免重复保存
+								if models.File_exists(dst) {
+									//fmt.Println("文件存在")
 
 								} else {
+									//fmt.Println("文件no存在")
+									ferr := ctx.SaveUploadedFile(file, dst)
+									if ferr == nil {
+										//文件保存成功
 
-									Return_json(ctx, "file_save_err", nil)
-									ctx.Abort() //end
+									} else {
+
+										Return_json(ctx, "file_save_err", nil)
+										ctx.Abort() //end
+									}
 								}
-							}
-							//记录到数据库
+								//记录到数据库
 
-							//先检查数据库有没有数据
-							fund_file_info := models.File_info{
-								Name:   filename,
-								Sha256: hashString,
-								Mime:   mimeType,
-								Type:   "image",
-								UserID: user_info.UserID,
-							}
-							fund_file_info2 := models.File_info{}
+								//先检查数据库有没有数据
+								fund_file_info := models.File_info{
+									Name:   filename,
+									Sha256: hashString,
+									Mime:   mimeType,
+									Type:   "image",
+									UserID: user_info.UserID,
+								}
+								fund_file_info2 := models.File_info{}
 
-							models.DB.Where(&fund_file_info).Find(&fund_file_info2)
+								models.DB.Where(&fund_file_info).Find(&fund_file_info2)
 
-							if fund_file_info2.ID != 0 {
-								fmt.Println(fund_file_info2)
-								fund_file_info2.Const += 1
-								models.DB.Where(&fund_file_info).Updates(&fund_file_info2)
+								if fund_file_info2.ID != 0 {
+									fmt.Println(fund_file_info2)
+									fund_file_info2.Const += 1
+									models.DB.Where(&fund_file_info).Updates(&fund_file_info2)
+								} else {
+									models.DB.Create(&fund_file_info) // 传入指针
+									fund_file_info2 = fund_file_info
+								}
+
+								red := map[string]interface{}{
+									"data": fund_file_info2,
+								}
+
+								Return_json(ctx, "api_ok", red)
+
 							} else {
-								models.DB.Create(&fund_file_info) // 传入指针
-								fund_file_info2 = fund_file_info
-							}
 
-							red := map[string]interface{}{
-								"data": fund_file_info2,
+								Return_json(ctx, "file_mime_err", nil)
 							}
-
-							Return_json(ctx, "api_ok", red)
 
 						} else {
 
-							Return_json(ctx, "file_mime_err", nil)
+							Return_json(ctx, "file_size_err", nil)
 						}
-
 					} else {
 
 						Return_json(ctx, "file_size_err", nil)
 					}
-				} else {
 
-					Return_json(ctx, "file_size_err", nil)
+				} else {
+					Return_json(ctx, "file_name_err", nil)
 				}
+
 			} else {
 				Return_json(ctx, "file_get_err", nil)
 			}
