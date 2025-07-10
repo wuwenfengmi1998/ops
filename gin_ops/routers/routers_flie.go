@@ -24,8 +24,10 @@ func Router_file(r *gin.RouterGroup) {
 		id_int, err := strconv.ParseInt(id, 10, 0)
 		if err == nil {
 			//fmt.Println(id_int)
-			file_info := models.File_info{}
-			models.DB.Where("ID = ?", id_int).First(&file_info)
+			file_info := models.File_info{
+				ID: uint(id_int),
+			}
+			models.DB.Where(file_info.ID).First(&file_info)
 
 			fmt.Println(file_info)
 
