@@ -78,7 +78,7 @@ function post_json(path, json, callback) {
   data["data"] = json;
   var cookie = load_json("cookie");
   if (cookie) {
-    data["cookie"] = cookie;
+    data["cookie"] = cookie.Value;
   }
   var re_data = {};
 

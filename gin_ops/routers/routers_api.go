@@ -1,8 +1,6 @@
 package routers
 
 import (
-	"saas/models"
-
 	"github.com/gin-gonic/gin"
 	"github.com/mitchellh/mapstructure"
 )
@@ -18,13 +16,9 @@ func Router_api(r *gin.RouterGroup) {
 		var jsonData map[string]interface{}
 		if err := ctx.ShouldBindJSON(&jsonData); err == nil {
 			//分离数据
-			var cookie_t models.Cookie
-			if err = mapstructure.Decode(jsonData["cookie"], &cookie_t); err == nil {
-				if cookie_t.Value != "" {
-					cookie_vel := cookie_t.Value
-					ctx.Set("cookie_value", cookie_vel)
-				}
 
+			if jsonData["cookie"] != "" {
+				ctx.Set("cookie_value", jsonData["cookie"])
 			}
 
 			var data_t map[string]interface{}

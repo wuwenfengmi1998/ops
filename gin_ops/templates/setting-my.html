@@ -149,7 +149,7 @@
             </div>
 
             <!-- 消息提示 -->
-            <div id="message" class="alert"></div>
+            <div id="message" class="alertavater"></div>
 
             <div class="preview-stats">
               <!-- <p>当前缩放: <span id="zoomValue">100%</span></p> -->
@@ -378,26 +378,24 @@
   }
 
   /* 消息提示 */
-  .alert {
+  .alertavater {
     padding: 15px;
     border-radius: 6px;
     margin-top: 20px;
     display: none;
   }
 
-  .alert-success {
+  .alertavater-success {
     background: #dff0d8;
     color: #3c763d;
   }
 
-  .alert-error {
+  .alertavater-error {
     background: #f2dede;
     color: var(--error-color);
   }
 
-  input[type="file"] {
-    display: none;
-  }
+ 
 </style>
 
 <!-- lib -->
@@ -453,6 +451,7 @@
   const image = document.getElementById('cropper-image');
   const message = document.getElementById('message');
   let currentScale = 1;
+  var avatar_id = 0;
 
   // 初始化Cropper
   function initCropper(imageSrc) {
@@ -562,17 +561,18 @@
     post_file("/image", blob, `avatar.png`, (c) => {
       if (c.statusCode == 200) {
         if (c.data.err_code == 0) {
-          
-          //banner_alert('success', "更换成功", 950)
           showMessage(`✅ 上传成功!`, 'success');
-          //avatar_toolt.hide();
+          avatar_id = c.data.return.id;
+          set_user_avatar(c.data.return.preview);
+          avatar_toolt.hide();
+
         } else {
-          showMessage(`❌ 上传失败:`+c.data.err_msg, 'error');
+          showMessage(`❌ 上传失败:` + c.data.err_msg, 'error');
           //banner_alert('warning', "服务错误", 3000)
         }
       } else {
         //banner_alert('danger', "网络连接错误：" + c.statusCode, 3000)
-        showMessage(`❌ 网络连接错误:`+c.statusCode, 'error');
+        showMessage(`❌ 网络连接错误:` + c.statusCode, 'error');
       }
     })
 
@@ -631,36 +631,58 @@
 
   //更新用户资料
   function updata_user_info() {
-    const url = '/api/v1/user/updata_info';
-    const sumt_data = {
-      avatar: get_user_avatar(),
+    post_json("/user/updata_info", {
+      avatar_id: avatar_id,
       username: document.getElementById("username").value,
       first_name: document.getElementById("first_name").value,
       birthday: document.getElementById("birthday-picker").value,
+    }, (c) => {
+      if (c.statusCode == 200) {
 
-
-    };
-    try {
-      const response = axios.post(url, sumt_data, {
-        headers: {
-          'Content-Type': 'application/json'
-        }
-      }).then(response => {
-        //console.log(response)
-        if (response.data.err_code == 0) {
-          location.reload()
+        if (c.data.err_code == 0) {
+          banner_alert('success', "更新成功", 950)
         } else {
-          console.log(response.data)
+          banner_alert('warning', "错误："+c.data.err_msg, 1000)
         }
 
-      });
-    } catch (error) {
-      if (error.response) {
-        // 服务器返回了错误状态码（如 4xx, 5xx）
-        console.error('服务器错误:', error.response.data);
+
+
       } else {
-        console.error('请求未完成:', error.message);
+        banner_alert('danger', "网络连接错误：" + c.error, 10000)
       }
-    }
+    });
+    // const url = '/api/v1/user/updata_info';
+    // const sumt_data = {
+    //   avatar: get_user_avatar(),
+    //   avatar_id:avatar_id,
+    //   username: document.getElementById("username").value,
+    //   first_name: document.getElementById("first_name").value,
+    //   birthday: document.getElementById("birthday-picker").value,
+
+
+    // };
+    // try {
+    //   const response = axios.post(url, sumt_data, {
+    //     headers: {
+    //       'Content-Type': 'application/json'
+    //     }
+    //   }).then(response => {
+    //     //console.log(response)
+    //     if (response.data.err_code == 0) {
+    //       location.reload()
+    //     } else {
+    //       console.log(response.data)
+    //     }
+
+    //   });
+    // } catch (error) {
+    //   if (error.response) {
+    //     // 服务器返回了错误状态码（如 4xx, 5xx）
+    //     console.error('服务器错误:', error.response.data);
+    //   } else {
+    //     console.error('请求未完成:', error.message);
+    //   }
+    // }
+
   }
 </script>

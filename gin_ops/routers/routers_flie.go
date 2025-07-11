@@ -167,7 +167,7 @@ func Router_file(r *gin.RouterGroup) {
 								models.DB.Where(&fund_file_info).Find(&fund_file_info2)
 
 								if fund_file_info2.ID != 0 {
-									fmt.Println(fund_file_info2)
+									//fmt.Println(fund_file_info2)
 									fund_file_info2.Const += 1
 									models.DB.Where(&fund_file_info).Updates(&fund_file_info2)
 								} else {
@@ -176,8 +176,17 @@ func Router_file(r *gin.RouterGroup) {
 									fund_file_info2 = fund_file_info
 								}
 
+								//url_download:=fmt.Sprintf("")
+								file_id_str := fmt.Sprintf("%d", fund_file_info2.ID)
+								url_download := path.Join(Url_flie_download_from_id_head, file_id_str)
+								url_preview := path.Join(Url_flie_preview_from_id_head, file_id_str)
+
 								red := map[string]interface{}{
-									"data": fund_file_info2,
+									"id":       fund_file_info2.ID,
+									"name":     fund_file_info2.Name,
+									"sha256":   fund_file_info2.Sha256,
+									"download": url_download,
+									"preview":  url_preview,
 								}
 
 								Return_json(ctx, "api_ok", red)
