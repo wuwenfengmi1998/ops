@@ -51,6 +51,7 @@ func V1_user_api(r *gin.RouterGroup) {
 		//转换传进来的数据
 		var jsonData From_user_add
 		data, is_have_data := ctx.Get("data")
+		//fmt.Println(data)
 		if is_have_data {
 			if err := mapstructure.Decode(data, &jsonData); err == nil {
 				//转换字段
@@ -61,28 +62,33 @@ func V1_user_api(r *gin.RouterGroup) {
 					Date:  time.Now(),
 					// Date 字段无需赋值，数据库会自动填充默认值
 				}
-				//fmt.Println(newUser)
-				//对用户的密码进行哈希替换
-				newUser.Pass = models.Hash_user_pass(newUser.Pass)
+				if newUser.Name != "" && newUser.Pass != "" && newUser.Email != "" {
+					//fmt.Println(newUser)
+					//对用户的密码进行哈希替换
+					newUser.Pass = models.Hash_user_pass(newUser.Pass)
 
-				//用户名是唯一的，先读取是否有这个用户名
-				var user models.User
-				user.Name = newUser.Name
+					//用户名是唯一的，先读取是否有这个用户名
+					var user models.User
+					user.Name = newUser.Name
 
-				if models.DB.Where(user.Name).First(&user).Error == nil {
-					//fmt.Println("找到用户:", user.ID)
-					Return_json(ctx, "user_name_dup", nil)
+					if models.DB.Where(&user).First(&user).Error == nil {
+						//fmt.Println("找到用户:", user.ID)
+						Return_json(ctx, "user_name_dup", nil)
+					} else {
+						//fmt.Println("用户不存在")
+						models.DB.Create(&newUser) // 传入指针
+
+						//创建info
+						var user_info models.User_info
+						user_info.AvatarPath = models.Configs_user.Avatar_path
+						user_info.UserID = newUser.ID
+						models.DB.Create(&user_info) // 传入指针
+
+						Return_json(ctx, "api_ok", nil)
+					}
+
 				} else {
-					//fmt.Println("用户不存在")
-					models.DB.Create(&newUser) // 传入指针
-
-					//创建info
-					var user_info models.User_info
-					user_info.AvatarPath = models.Configs_user.Avatar_path
-					user_info.UserID = newUser.ID
-					models.DB.Create(&user_info) // 传入指针
-
-					Return_json(ctx, "api_ok", nil)
+					Return_json(ctx, "json_error", nil)
 				}
 
 			} else {
@@ -320,73 +326,6 @@ func V1_user_api(r *gin.RouterGroup) {
 		} else {
 			Return_json(ctx, "user_no_sign", nil)
 		}
-		// //返回前端的数据
-		// err_msg = "user_api_error"
-		// err_code = Error_code[err_msg]
 
-		// //先判断是否已经登录
-		// //获取中间件处理的结果
-		// is_login, _ := ctx.Get("is_login")
-		// if is_login == true {
-		// 	//转换传进来的数据
-		// 	var jsonData map[string]interface{}
-		// 	if err := ctx.ShouldBindJSON(&jsonData); err == nil {
-
-		// 		//需要验证传入数据的合法性
-
-		// 		//读取已登录的用户信息
-		// 		user_, _ := ctx.Get("user")
-		// 		user, _ := user_.(*models.User)
-		// 		user_find := models.User{
-		// 			ID: user.ID,
-		// 		}
-
-		// 		models.DB.Where(&user_find).First(&user_find)
-
-		// 		pass_old := jsonData["pass_old"].(string)
-		// 		pass_new := jsonData["pass_new"].(string)
-		// 		//对用户的密码进行哈希替换
-		// 		pass_old = models.Hash_user_pass(pass_old)
-		// 		pass_new = models.Hash_user_pass(pass_new)
-
-		// 		if user_find.Pass == pass_old {
-
-		// 			new_user := models.User{
-		// 				Pass: pass_new,
-		// 			}
-
-		// 			//修改密码
-		// 			models.DB.Where(&user_find).Updates(&new_user)
-
-		// 			//密码修改后所有cookie都应该失效
-		// 			cookie_find := models.Cookie{
-		// 				UserID: user.ID,
-		// 			}
-		// 			models.DB.Where(&cookie_find).Delete(&cookie_find)
-
-		// 			err_msg = "api_ok"
-		// 			err_code = Error_code[err_msg]
-
-		// 		} else {
-		// 			err_msg = "user_password_err"
-		// 			err_code = Error_code[err_msg]
-		// 		}
-
-		// 	} else {
-		// 		err_msg = "json_error"
-		// 		err_code = Error_code[err_msg]
-		// 	}
-
-		// } else {
-		// 	//fmt.Println("no loged")
-		// 	err_msg = "user_no_sign"
-		// 	err_code = Error_code[err_msg]
-		// }
-
-		// ctx.JSON(200, map[string]interface{}{
-		// 	"api":      "ok",
-		// 	"err_code": err_code,
-		// 	"err_msg":  err_msg,
-		// })
 	})
 }

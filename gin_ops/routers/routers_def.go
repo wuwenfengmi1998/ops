@@ -59,8 +59,8 @@ func Router_def(r *gin.RouterGroup) {
 
 	// })
 	r.GET("/workorders", func(ctx *gin.Context) {
-		is_login, _ := ctx.Get("is_login")
-		user_info, _ := ctx.Get("user_info")
+
+		user_info, is_login := ctx.Get("user_info")
 		//判断是否登录
 		if is_login == true {
 
@@ -74,8 +74,8 @@ func Router_def(r *gin.RouterGroup) {
 	})
 
 	r.GET("/warehouses", func(ctx *gin.Context) {
-		is_login, _ := ctx.Get("is_login")
-		user_info, _ := ctx.Get("user_info")
+
+		user_info, is_login := ctx.Get("user_info")
 		//判断是否登录
 		if is_login == true {
 			total_pages := models.Warehouse_get_total_pages() //获取总页数
@@ -103,8 +103,7 @@ func Router_def(r *gin.RouterGroup) {
 		}
 	})
 	r.GET("/warehouses/:id", func(ctx *gin.Context) {
-		is_login, _ := ctx.Get("is_login")
-		user_info, _ := ctx.Get("user_info")
+		user_info, is_login := ctx.Get("user_info")
 		//判断是否登录
 		if is_login == true {
 			id := ctx.Param("id")
@@ -153,8 +152,8 @@ func Router_def(r *gin.RouterGroup) {
 	})
 
 	r.GET("/warehouse/:id", func(ctx *gin.Context) {
-		is_login, _ := ctx.Get("is_login")
-		user_info, _ := ctx.Get("user_info")
+
+		user_info, is_login := ctx.Get("user_info")
 		//判断是否登录
 		if is_login == true {
 			id := ctx.Param("id")
