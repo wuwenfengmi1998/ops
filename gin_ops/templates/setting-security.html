@@ -207,32 +207,27 @@
   function change_email() {
     if (dom_mail.value != "") {
       if (isValidEmail(dom_mail.value)) {
-        const url = '/api/v1/user/change_email';
-        const sumt_data = {
+
+        post_json("/user/change_email", {
           new_email: dom_mail.value
-        };
-        try {
-          const response = axios.post(url, sumt_data, {
-            headers: {
-              'Content-Type': 'application/json'
-            }
-          }).then(response => {
-            if (response.data.err_code == 0) {
-              dom_mail.classList.add("is-valid");
+        }, (c) => {
+          if (c.statusCode == 200) {
+
+            if (c.data.err_code == 0) {
+              banner_alert('success', "Email更新成功", 1000, () => {
+
+              })
+
             } else {
-              console.log(response.data)
+              banner_alert('warning', "错误：" + c.data.err_msg, 1000)
             }
 
-          });
-        } catch (error) {
-          if (error.response) {
-            // 服务器返回了错误状态码（如 4xx, 5xx）
-            console.error('服务器错误:', error.response.data);
+
+
           } else {
-            console.error('请求未完成:', error.message);
+            banner_alert('danger', "网络连接错误：" + c.error, 10000)
           }
-        }
-        //console.log(sumt_data);
+        })
       } else {
         dom_mail.classList.add("is-invalid");
         dom_mail.placeholder = "不是邮箱";
@@ -266,35 +261,61 @@
     }
 
     if (valid) {
-      const url = '/api/v1/user/change_pass';
-      const sumt_data = {
+
+      post_json("/user/change_pass", {
         pass_old: dom_pass_old.value,
         pass_new: dom_pass_new.value,
-      };
-      try {
-        const response = axios.post(url, sumt_data, {
-          headers: {
-            'Content-Type': 'application/json'
-          }
-        }).then(response => {
-          if (response.data.err_code == 0) {
-            location.href = '/sign-in'
-          } else if (response.data.err_code == 3) {
+      }, (c) => {
+        if (c.statusCode == 200) {
+
+          if (c.data.err_code == 0) {
+            banner_alert('success', "密码更新成功", 1000, () => {
+              location.href = '/sign-in'
+            })
+
+          } else if (c.data.err_code == 3) {
             dom_pass_old.classList.add("is-invalid")
             document.getElementById("pass_old_err").innerHTML = "密码不正确";
           } else {
-            console.log(response.data)
+            banner_alert('warning', "错误：" + c.data.err_msg, 1000)
           }
 
-        });
-      } catch (error) {
-        if (error.response) {
-          // 服务器返回了错误状态码（如 4xx, 5xx）
-          console.error('服务器错误:', error.response.data);
+
+
         } else {
-          console.error('请求未完成:', error.message);
+          banner_alert('danger', "网络连接错误：" + c.error, 10000)
         }
-      }
+      })
+
+      // const url = '/api/v1/user/change_pass';
+      // const sumt_data = {
+      //   pass_old: dom_pass_old.value,
+      //   pass_new: dom_pass_new.value,
+      // };
+      // try {
+      //   const response = axios.post(url, sumt_data, {
+      //     headers: {
+      //       'Content-Type': 'application/json'
+      //     }
+      //   }).then(response => {
+      //     if (response.data.err_code == 0) {
+      //       location.href = '/sign-in'
+      //     } else if (response.data.err_code == 3) {
+      //       dom_pass_old.classList.add("is-invalid")
+      //       document.getElementById("pass_old_err").innerHTML = "密码不正确";
+      //     } else {
+      //       console.log(response.data)
+      //     }
+
+      //   });
+      // } catch (error) {
+      //   if (error.response) {
+      //     // 服务器返回了错误状态码（如 4xx, 5xx）
+      //     console.error('服务器错误:', error.response.data);
+      //   } else {
+      //     console.error('请求未完成:', error.message);
+      //   }
+      // }
     }
 
 

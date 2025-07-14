@@ -2,12 +2,45 @@ package routers
 
 import (
 	"fmt"
+	"path"
 	"saas/models"
 	"time"
 
 	"github.com/gin-gonic/gin"
 	"github.com/mitchellh/mapstructure"
 )
+
+func user_logout(ctx *gin.Context) {
+	//返回前端的数据
+
+	//先判断是否已经登录
+	//获取中间件处理的结果
+	_, is_login := ctx.Get("user_info")
+	//fmt.Println(is_login)
+	//fmt.Println(user_info)
+	if is_login {
+		//fmt.Println("loged")
+		cookie_any, _ := ctx.Get("cookie") //这个cookie在中间件已经判断为有效的，否则is_login不可能为true，所以直接在数据库删除应该是安全的
+		//删除数据库里的cookie
+		var cookie models.Cookie
+		if err := mapstructure.Decode(cookie_any, &cookie); err == nil {
+			models.DB.Where(&cookie).Delete(&cookie)
+			//删除前端cookie
+			ctx.SetCookie("user", "", -1, "/", models.Configs_wed.Host, models.Configs_wed.Tls, true)
+			ctx.Set("cookie", nil)
+
+			Return_json(ctx, "api_ok", nil)
+		} else {
+
+			Return_json(ctx, "json_error", nil)
+
+		}
+
+	} else {
+		ctx.SetCookie("user", "", -1, "/", models.Configs_wed.Host, models.Configs_wed.Tls, true)
+		Return_json(ctx, "user_no_sign", nil)
+	}
+}
 
 func V1_user_api(r *gin.RouterGroup) {
 
@@ -159,40 +192,11 @@ func V1_user_api(r *gin.RouterGroup) {
 	})
 
 	r.POST("/logout", func(ctx *gin.Context) {
-		//返回前端的数据
-
-		//先判断是否已经登录
-		//获取中间件处理的结果
-		_, is_login := ctx.Get("user_info")
-		//fmt.Println(is_login)
-		//fmt.Println(user_info)
-		if is_login {
-			//fmt.Println("loged")
-			cookie_any, _ := ctx.Get("cookie") //这个cookie在中间件已经判断为有效的，否则is_login不可能为true，所以直接在数据库删除应该是安全的
-			//删除数据库里的cookie
-			var cookie models.Cookie
-			if err := mapstructure.Decode(cookie_any, &cookie); err == nil {
-				models.DB.Where(&cookie).Delete(&cookie)
-				//删除前端cookie
-				ctx.SetCookie("user", "", -1, "/", models.Configs_wed.Host, models.Configs_wed.Tls, true)
-				ctx.Set("cookie", nil)
-
-				Return_json(ctx, "api_ok", nil)
-			} else {
-
-				Return_json(ctx, "json_error", nil)
-
-			}
-
-		} else {
-			ctx.SetCookie("user", "", -1, "/", models.Configs_wed.Host, models.Configs_wed.Tls, true)
-			Return_json(ctx, "user_no_sign", nil)
-		}
-
+		user_logout(ctx)
 	})
 
 	r.POST("/updata_info", func(ctx *gin.Context) {
-		_, is_login := ctx.Get("user_info")
+		user_info_any, is_login := ctx.Get("user_info")
 		if is_login {
 
 			//转换传进来的数据
@@ -200,13 +204,36 @@ func V1_user_api(r *gin.RouterGroup) {
 			data, is_have_data := ctx.Get("data")
 			if is_have_data {
 				if err := mapstructure.Decode(data, &json_data); err == nil {
-					fmt.Println(json_data)
-					//先判断头像是否合法
-					if json_data.Avatar_id != 0 {
+					//fmt.Println(json_data)
 
+					updata_user_info := models.User_info{
+						FirstName: json_data.First_name,
+						Username:  json_data.Username,
+						Birthdate: models.Time_date_str_to_time(json_data.Birthday),
 					}
 
-					Return_json(ctx, "api_ok", nil)
+					user_info := user_info_any.(*models.User_info)
+					//先判断头像是否合法
+					if json_data.Avatar_id != 0 {
+						file_info := models.File_info{}
+						file_info.ID = json_data.Avatar_id
+						if models.DB.Where(&file_info).First(&file_info).Error == nil {
+							//读取到文件，判断是不是图片
+							if file_info.Type == "image" && file_info.UserID == user_info.UserID {
+								file_id_str := fmt.Sprintf("%d", file_info.ID)
+								url_preview := path.Join(Url_flie_preview_from_id_head, file_id_str)
+								updata_user_info.AvatarPath = url_preview
+							}
+
+						}
+					}
+
+					if models.DB.Where(&user_info).Select("FirstName", "Username", "Birthdate").Updates(&updata_user_info).Error == nil {
+						Return_json(ctx, "api_ok", nil)
+					} else {
+						Return_json(ctx, "DB_err", nil)
+					}
+
 				} else {
 					Return_json(ctx, "json_error", nil)
 				}
@@ -219,113 +246,80 @@ func V1_user_api(r *gin.RouterGroup) {
 		} else {
 			Return_json(ctx, "user_no_sign", nil)
 		}
-		// //返回前端的数据
-		// err_msg = "user_api_error"
-		// err_code = Error_code[err_msg]
 
-		// //先判断是否已经登录
-		// //获取中间件处理的结果
-		// is_login, _ := ctx.Get("is_login")
-		// if is_login == true {
-		// 	//转换传进来的数据
-		// 	var jsonData map[string]interface{}
-		// 	if err := ctx.ShouldBindJSON(&jsonData); err == nil {
-
-		// 		user_info_, _ := ctx.Get("user_info")
-		// 		user_info, _ := user_info_.(*models.User_info) //这个数据本身就是从数据库读出来的，理论上结构转换不会出错
-		// 		user_info_find := models.User_info{
-		// 			ID: user_info.ID,
-		// 		}
-
-		// 		new_user_info := models.User_info{
-		// 			AvatarPath: jsonData["avatar"].(string),
-		// 			FirstName:  jsonData["first_name"].(string),
-		// 			Username:   jsonData["username"].(string),
-		// 			Birthdate:  models.Time_date_str_to_time(jsonData["birthday"].(string)),
-		// 		}
-
-		// 		//需要验证传入数据的合法性 例如头像url是否站内的
-		// 		if strings.HasPrefix(new_user_info.AvatarPath, models.Configs_user.Avatar_ginrouter_path) {
-
-		// 		} else {
-		// 			new_user_info.AvatarPath = models.Configs_user.Avatar_path
-		// 		}
-
-		// 		//fmt.Printf("%%#v: %#v\n", new_user_info)
-		// 		models.DB.Where(&user_info_find).Updates(&new_user_info)
-
-		// 		err_msg = "api_ok"
-		// 		err_code = Error_code[err_msg]
-
-		// 	} else {
-		// 		err_msg = "json_error"
-		// 		err_code = Error_code[err_msg]
-		// 	}
-
-		// } else {
-		// 	//fmt.Println("no loged")
-		// 	err_msg = "user_no_sign"
-		// 	err_code = Error_code[err_msg]
-		// }
-
-		// ctx.JSON(200, map[string]interface{}{
-		// 	"api":      "ok",
-		// 	"err_code": err_code,
-		// 	"err_msg":  err_msg,
-		// })
 	})
 
 	r.POST("/change_email", func(ctx *gin.Context) {
-		// //返回前端的数据
-		// err_msg = "user_api_error"
-		// err_code = Error_code[err_msg]
+		user_info_any, is_login := ctx.Get("user_info")
+		if is_login {
+			data, is_have_data := ctx.Get("data")
+			if is_have_data {
+				datas := data.(*map[string]interface{})
+				email_str := (*datas)["new_email"].(string)
+				if models.Is_email_valid(email_str) {
+					user_updata := models.User{
+						Email: email_str,
+					}
+					user_info := user_info_any.(*models.User_info)
+					user_fund := models.User{
+						ID: user_info.UserID,
+					}
+					if models.DB.Where(&user_fund).Updates(&user_updata).Error == nil {
+						Return_json(ctx, "api_ok", nil)
+					} else {
+						Return_json(ctx, "DB_err", nil)
+					}
 
-		// //先判断是否已经登录
-		// //获取中间件处理的结果
-		// is_login, _ := ctx.Get("is_login")
-		// if is_login == true {
-		// 	//转换传进来的数据
-		// 	var jsonData map[string]interface{}
-		// 	if err := ctx.ShouldBindJSON(&jsonData); err == nil {
+				} else {
+					Return_json(ctx, "email_error", nil)
+				}
 
-		// 		//需要验证传入数据的合法性
-		// 		if models.Is_email_valid(jsonData["new_email"].(string)) {
-		// 			user_, _ := ctx.Get("user")
-		// 			user, _ := user_.(*models.User)
-		// 			user_find := models.User{
-		// 				ID: user.ID,
-		// 			}
-		// 			user_new := models.User{
-		// 				Email: jsonData["new_email"].(string),
-		// 			}
-		// 			models.DB.Where(&user_find).Updates(&user_new)
-		// 			err_msg = "api_ok"
-		// 			err_code = Error_code[err_msg]
+			} else {
+				Return_json(ctx, "json_error", nil)
+			}
 
-		// 		} else {
-		// 			err_msg = "email_error"
-		// 			err_code = Error_code[err_msg]
-		// 		}
+		} else {
+			Return_json(ctx, "user_no_sign", nil)
+		}
 
-		// 	} else {
-		// 		err_msg = "json_error"
-		// 		err_code = Error_code[err_msg]
-		// 	}
-
-		// } else {
-		// 	//fmt.Println("no loged")
-		// 	err_msg = "user_no_sign"
-		// 	err_code = Error_code[err_msg]
-		// }
-
-		// ctx.JSON(200, map[string]interface{}{
-		// 	"api":      "ok",
-		// 	"err_code": err_code,
-		// 	"err_msg":  err_msg,
-		// })
 	})
 
 	r.POST("/change_pass", func(ctx *gin.Context) {
+		user_info_any, is_login := ctx.Get("user_info")
+		if is_login {
+			data, is_have_data := ctx.Get("data")
+			if is_have_data {
+				datas := data.(*map[string]interface{})
+				pass_old := (*datas)["pass_old"].(string)
+				pass_new := (*datas)["pass_new"].(string)
+				pass_old = models.Hash_user_pass(pass_old)
+				pass_new = models.Hash_user_pass(pass_new)
+				user_info := user_info_any.(*models.User_info)
+				user_fund := models.User{
+					ID: user_info.UserID,
+				}
+				models.DB.Where(&user_fund).First(&user_fund)
+				if user_fund.Pass == pass_old {
+					user_new := models.User{
+						Pass: pass_new,
+					}
+					if models.DB.Where(&user_fund).Updates(&user_new).Error == nil {
+						user_logout(ctx)
+						//Return_json(ctx, "api_ok", nil)
+					} else {
+						Return_json(ctx, "DB_err", nil)
+					}
+				} else {
+					Return_json(ctx, "user_password_err", nil)
+				}
+
+			} else {
+				Return_json(ctx, "json_error", nil)
+			}
+
+		} else {
+			Return_json(ctx, "user_no_sign", nil)
+		}
 		// //返回前端的数据
 		// err_msg = "user_api_error"
 		// err_code = Error_code[err_msg]

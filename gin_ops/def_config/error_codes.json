@@ -20,5 +20,6 @@
     "warehouses_id_err":17,
     "file_id_error":18,
     "file_name_err":19,
-    "file_not_fund":20
+    "file_not_fund":20,
+    "DB_err":21
 }

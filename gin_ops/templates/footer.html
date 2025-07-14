@@ -153,7 +153,7 @@
     backdrop: false // 关闭背景层
   });
 
-  function banner_alert(type, text, close) {
+  function banner_alert(type, text, close ,callback) {
     var ban_type = $('#banner_alf_type')
     var ban_text = $('#banner_alf_text')
     ban_type.removeClass('alert-success');
@@ -186,7 +186,9 @@
 
     banner_offcanvas.show();
     setTimeout(() => {
-      banner_offcanvas?.hide()
+      banner_offcanvas?.hide();
+      callback();
+
     }, close ? close : 1000);
   }
 

@@ -394,7 +394,9 @@
     background: #f2dede;
     color: var(--error-color);
   }
-
+  input[type="file"] {
+    display: none;
+  }
  
 </style>
 
@@ -640,7 +642,10 @@
       if (c.statusCode == 200) {
 
         if (c.data.err_code == 0) {
-          banner_alert('success', "更新成功", 950)
+          banner_alert('success', "更新成功", 1000,()=>{
+            location.reload();
+          })
+
         } else {
           banner_alert('warning', "错误："+c.data.err_msg, 1000)
         }
