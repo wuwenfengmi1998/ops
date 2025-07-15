@@ -29,7 +29,7 @@ func Use_login_from_cookie(ctx *gin.Context) {
 				var cookie_up models.Cookie
 				cookie_up.UpdatedAt = time.Now()
 				cookie_up.ExpiresAt = time.Now().Add(time.Duration(models.Configs_user.Cookie_timeout) * time.Second) //计算过期时间
-				models.DB.Model(&models.Cookie{}).Where(&cookie).Updates(&cookie_up)
+				models.DB.Where("ID=?", cookie.ID).Updates(&cookie_up)
 				//更新前端cookie
 				ctx.SetCookie("user", cookie.Value, models.Configs_user.Cookie_timeout, "/", models.Configs_wed.Host, models.Configs_wed.Tls, true)
 				cookie.UpdatedAt = cookie_up.UpdatedAt

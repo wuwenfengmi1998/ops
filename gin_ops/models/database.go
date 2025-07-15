@@ -60,7 +60,7 @@ type Cookie struct {
 	Path         string    `gorm:"size:255;not null;default:/"`
 	ExpiresAt    time.Time `gorm:"type:datetime;index"`
 	CreatedAt    time.Time `gorm:"type:datetime;not null;default:CURRENT_TIMESTAMP"`
-	UpdatedAt    time.Time `gorm:"type:datetime;not null;default:CURRENT_TIMESTAMP"`
+	UpdatedAt    time.Time `gorm:"type:datetime;index;not null;default:CURRENT_TIMESTAMP"`
 	SecureFlag   bool      `gorm:"not null;default:false"`
 	HttpOnly     bool      `gorm:"not null;default:false"`
 	SameSite     string    `gorm:"size:10;not null;default:'Lax'"`

@@ -77,7 +77,7 @@ func main() {
 	r.Static("/dist/", "./static/dist/")
 
 	//静态用户上传的文件
-	r.Static("/avatar/", models.Configs_file.Pahts["avatar"])
+	//r.Static("/avatar/", models.Configs_file.Pahts["avatar"])
 	//store := cookie.NewStore([]byte("secret"))
 
 	// 自定义 404 页面（需要提前加载模板）

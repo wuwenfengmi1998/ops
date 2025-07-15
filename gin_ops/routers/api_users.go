@@ -24,7 +24,7 @@ func user_logout(ctx *gin.Context) {
 		//删除数据库里的cookie
 		var cookie models.Cookie
 		if err := mapstructure.Decode(cookie_any, &cookie); err == nil {
-			models.DB.Where("ID=?", cookie.ID).Delete(&cookie)
+			models.DB.Where(&cookie).Delete(&cookie)
 			//删除前端cookie
 			ctx.SetCookie("user", "", -1, "/", models.Configs_wed.Host, models.Configs_wed.Tls, true)
 			ctx.Set("cookie", nil)
@@ -71,7 +71,7 @@ func V1_user_api(r *gin.RouterGroup) {
 					var user models.User
 					user.Name = newUser.Name
 
-					if models.DB.Where("Name=?", user.Name).First(&user).Error == nil {
+					if models.DB.Where(&user).First(&user).Error == nil {
 						//fmt.Println("找到用户:", user.ID)
 						Return_json(ctx, "user_name_dup", nil)
 					} else {
@@ -121,7 +121,7 @@ func V1_user_api(r *gin.RouterGroup) {
 
 					var user models.User
 					user.Name = newUser.Name
-					if models.DB.Where("Name=?", user.Name).First(&user).Error == nil {
+					if models.DB.Where(&user).First(&user).Error == nil {
 						// 有数据
 						//fmt.Println(user)
 						//fmt.Println(newUser)
@@ -163,7 +163,7 @@ func V1_user_api(r *gin.RouterGroup) {
 								UserID: user.ID,
 							}
 
-							models.DB.Where("ID=?", user_info.ID).First(&user_info)
+							models.DB.Where(&user_info).First(&user_info)
 
 							red := map[string]interface{}{
 								"cookie":    new_cookie,
@@ -225,7 +225,7 @@ func V1_user_api(r *gin.RouterGroup) {
 					if json_data.Avatar_id != 0 {
 						file_info := models.File_info{}
 						file_info.ID = json_data.Avatar_id
-						if models.DB.Where("ID=?", file_info.ID).First(&file_info).Error == nil {
+						if models.DB.Where(&file_info).First(&file_info).Error == nil {
 							//读取到文件，判断是不是图片
 							if file_info.Type == "image" && file_info.UserID == user_info.UserID {
 								file_id_str := fmt.Sprintf("%d", file_info.ID)
@@ -273,7 +273,7 @@ func V1_user_api(r *gin.RouterGroup) {
 					user_fund := models.User{
 						ID: user_info.UserID,
 					}
-					if models.DB.Where("ID=?", user_fund.ID).Updates(&user_updata).Error == nil {
+					if models.DB.Where(&user_fund).Updates(&user_updata).Error == nil {
 						Return_json(ctx, "api_ok", nil)
 					} else {
 						Return_json(ctx, "DB_err", nil)
@@ -307,12 +307,12 @@ func V1_user_api(r *gin.RouterGroup) {
 				user_fund := models.User{
 					ID: user_info.UserID,
 				}
-				models.DB.Where("ID=?", user_fund.ID).First(&user_fund)
+				models.DB.Where(&user_fund).First(&user_fund)
 				if user_fund.Pass == pass_old {
 					user_new := models.User{
 						Pass: pass_new,
 					}
-					if models.DB.Where("ID=?", user_fund.ID).Updates(&user_new).Error == nil {
+					if models.DB.Where(&user_fund).Updates(&user_new).Error == nil {
 						user_logout(ctx)
 						//Return_json(ctx, "api_ok", nil)
 					} else {

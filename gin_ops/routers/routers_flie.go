@@ -28,7 +28,7 @@ func Router_file(r *gin.RouterGroup) {
 				file_info := models.File_info{
 					ID: uint(id_int),
 				}
-				if models.DB.Where("ID=?", file_info.ID).First(&file_info).Error == nil {
+				if models.DB.Where(&file_info).First(&file_info).Error == nil {
 					Return_file(ctx, &file_info, true)
 				} else {
 					//fmt.Println("not fund")
@@ -53,7 +53,7 @@ func Router_file(r *gin.RouterGroup) {
 				file_info := models.File_info{
 					ID: uint(id_int),
 				}
-				if models.DB.Where("ID=?", file_info.ID).First(&file_info).Error == nil {
+				if models.DB.Where(&file_info).First(&file_info).Error == nil {
 					Return_file(ctx, &file_info, false)
 				} else {
 					//fmt.Println("not fund")
