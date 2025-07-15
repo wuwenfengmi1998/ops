@@ -228,10 +228,10 @@
 
           switch (c.data.err_code) {
             case 0:
-              banner_alert('success', "注册成功", 950)
-              setTimeout(() => {
+              banner_alert('success', "注册成功", 1000,()=>{
                 location.href = '/sign-in'
-              }, 1000);
+              })
+              
               break;
             case 1:
               banner_alert('warning', "用户名已存在", 1000)

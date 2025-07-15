@@ -243,8 +243,8 @@
         }
 
         if (data_chack) {
-            const url = '/api/v1/warehouses_api/add_item';
-            const sumt_data = {
+
+            post_json("/warehouses_api/add_item", {
                 warehouse_id: parseInt("{{.warehouse_id}}", 10),
                 item_name: $("#item_name").val(),
                 item_sn: $("#item_sn").val(),
@@ -252,31 +252,60 @@
                 item_who: $("#item_who").val(),
                 item_int: parseInt($("#item_int").val(), 10),
                 item_consts: parseFloat($("#item_consts").val()),
+            }, (c) => {
+                if (c.statusCode == 200) {
+                    if (c.data.err_code == 0) {
+                        //save_json("cookie", c.data.return.cookie)
+                        banner_alert('success', "添加成功", 1000, () => {
+                            location.reload();
+                        })
 
-            };
-
-            try {
-                const response = axios.post(url, sumt_data, {
-                    headers: {
-                        'Content-Type': 'application/json'
+                    } else {
+                        banner_alert('warning', "err:" + c.data.err_msg, 3000)
                     }
-                }).then(response => {
-                    console.log('提交成功:', response.data); // 正确打印服务器数据
-
-                    if (response.data.err_code == 0) {
-                        new_warehouses_item_windows_dom.hide();
-                        location.reload();
-                    }
-
-                });
-            } catch (error) {
-                if (error.response) {
-                    // 服务器返回了错误状态码（如 4xx, 5xx）
-                    console.error('服务器错误:', error.response.data);
                 } else {
-                    console.error('请求未完成:', error.message);
+                    banner_alert('danger', "网络连接错误：" + c.statusCode, 3000)
                 }
-            }
+
+            })
+
+           new_warehouses_item_windows_dom.hide();
+
+
+            // const url = '/api/v1/warehouses_api/add_item';
+            // const sumt_data = {
+            //     warehouse_id: parseInt("{{.warehouse_id}}", 10),
+            //     item_name: $("#item_name").val(),
+            //     item_sn: $("#item_sn").val(),
+            //     item_info: $("#item_info").val(),
+            //     item_who: $("#item_who").val(),
+            //     item_int: parseInt($("#item_int").val(), 10),
+            //     item_consts: parseFloat($("#item_consts").val()),
+
+            // };
+
+            // try {
+            //     const response = axios.post(url, sumt_data, {
+            //         headers: {
+            //             'Content-Type': 'application/json'
+            //         }
+            //     }).then(response => {
+            //         console.log('提交成功:', response.data); // 正确打印服务器数据
+
+            //         if (response.data.err_code == 0) {
+            //             new_warehouses_item_windows_dom.hide();
+            //             location.reload();
+            //         }
+
+            //     });
+            // } catch (error) {
+            //     if (error.response) {
+            //         // 服务器返回了错误状态码（如 4xx, 5xx）
+            //         console.error('服务器错误:', error.response.data);
+            //     } else {
+            //         console.error('请求未完成:', error.message);
+            //     }
+            // }
         }
 
     }

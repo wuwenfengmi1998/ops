@@ -87,7 +87,8 @@
                     </svg>
                     {{.UsedCapacity}}
                   </div>
-                  <a href="/warehouse/{{.ID}}" class="card-btn"><!-- Download SVG icon from http://tabler-icons.io/i/phone -->
+                  <a href="/warehouse/{{.ID}}"
+                    class="card-btn"><!-- Download SVG icon from http://tabler-icons.io/i/phone -->
                     <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"
                       stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
                       class="icon icon-tabler icons-tabler-outline icon-tabler-binoculars">
@@ -136,7 +137,7 @@
 
 
               {{range .page_range}}
-                <li class="page-item {{.active}}"><a class="page-link" href="{{.page_href}} ">{{.page}} </a></li>
+              <li class="page-item {{.active}}"><a class="page-link" href="{{.page_href}} ">{{.page}} </a></li>
               {{end}}
 
               <li class="page-item {{if .disabled_next_page}}disabled{{end}}">
@@ -176,18 +177,7 @@
       </div>
       <div class="modal-body">
         <div class="row mb-3 align-items-end">
-          <div class="col-auto">
-            <a href="#" class="avatar avatar-upload rounded">
-              <!-- Download SVG icon from http://tabler-icons.io/i/plus -->
-              <svg xmlns="http://www.w3.org/2000/svg" class="icon" width="24" height="24" viewBox="0 0 24 24"
-                stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
-                <path stroke="none" d="M0 0h24v24H0z" fill="none" />
-                <path d="M12 5l0 14" />
-                <path d="M5 12l14 0" />
-              </svg>
-              <span class="avatar-upload-text">添加图片</span>
-            </a>
-          </div>
+
           <div class="col">
             <label class="form-label">仓库名*</label>
             <input type="text" class="form-control" id="wh_name" />
@@ -227,42 +217,65 @@
 
     //数据合法，推送
     if (data_chack) {
-      const url = '/api/v1/warehouses_api/create';
-      const sumt_data = {
+
+      post_json("/warehouses_api/create", {
         warehouses_name: $("#wh_name").val(),
         warehouses_info: $("#wh_info").val()
-
-      };
-
-      try {
-        const response = axios.post(url, sumt_data, {
-          headers: {
-            'Content-Type': 'application/json'
+      }, (c) => {
+        if (c.statusCode == 200) {
+          if (c.data.err_code == 0) {
+            //save_json("cookie", c.data.return.cookie)
+            banner_alert('success', "添加成功", 1000,()=>{
+              location.reload();
+            })
+           
+          } else {
+            banner_alert('warning', "err:"+c.data.err_msg, 3000)
           }
-        }).then(response => {
-          console.log('提交成功:', response.data); // 正确打印服务器数据
-          //跳转到主页
-          if (response.data.err_code == 0) {
-            new_warehouses_windows_dom.hide();
-            location.reload();
-          }
-
-
-
-        });
-      } catch (error) {
-        if (error.response) {
-          // 服务器返回了错误状态码（如 4xx, 5xx）
-          console.error('服务器错误:', error.response.data);
         } else {
-          console.error('请求未完成:', error.message);
+          banner_alert('danger', "网络连接错误：" + c.statusCode, 3000)
         }
-      }
+
+      })
+
+      new_warehouses_windows_dom.hide();
+
+
+      // const url = '/api/v1/warehouses_api/create';
+      // const sumt_data = {
+      //   warehouses_name: $("#wh_name").val(),
+      //   warehouses_info: $("#wh_info").val()
+
+      // };
+
+      // try {
+      //   const response = axios.post(url, sumt_data, {
+      //     headers: {
+      //       'Content-Type': 'application/json'
+      //     }
+      //   }).then(response => {
+      //     console.log('提交成功:', response.data); // 正确打印服务器数据
+      //     //跳转到主页
+      //     if (response.data.err_code == 0) {
+      //       new_warehouses_windows_dom.hide();
+      //       location.reload();
+      //     }
+
+
+
+      //   });
+      // } catch (error) {
+      //   if (error.response) {
+      //     // 服务器返回了错误状态码（如 4xx, 5xx）
+      //     console.error('服务器错误:', error.response.data);
+      //   } else {
+      //     console.error('请求未完成:', error.message);
+      //   }
+      // }
+
+
+
     }
-
-
-
-
 
   }
 </script>

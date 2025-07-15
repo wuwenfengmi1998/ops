@@ -165,11 +165,12 @@
           if (c.statusCode == 200) {
 							if (c.data.err_code == 0) {
 								//save_json("cookie", c.data.return.cookie)
-                banner_alert('success', "登录成功",950)
-								save_json("user_info", c.data.return.user_info)
-								setTimeout(() => {
-									location.href = '/'
-								}, 1000);
+                save_json("user_info", c.data.return.user_info)
+                banner_alert('success', "登录成功",1000,()=>{
+                  location.href = '/'
+                })
+								
+								
 							} else {
 								banner_alert('warning', "账号或密码不正确",3000)
 							}
