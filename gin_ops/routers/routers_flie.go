@@ -28,7 +28,7 @@ func Router_file(r *gin.RouterGroup) {
 				file_info := models.File_info{
 					ID: uint(id_int),
 				}
-				if models.DB.Where(&file_info).First(&file_info).Error == nil {
+				if models.DB.Where("ID=?", file_info.ID).First(&file_info).Error == nil {
 					Return_file(ctx, &file_info, true)
 				} else {
 					//fmt.Println("not fund")
@@ -53,7 +53,7 @@ func Router_file(r *gin.RouterGroup) {
 				file_info := models.File_info{
 					ID: uint(id_int),
 				}
-				if models.DB.Where(&file_info).First(&file_info).Error == nil {
+				if models.DB.Where("ID=?", file_info.ID).First(&file_info).Error == nil {
 					Return_file(ctx, &file_info, false)
 				} else {
 					//fmt.Println("not fund")
@@ -169,7 +169,7 @@ func Router_file(r *gin.RouterGroup) {
 								if fund_file_info2.ID != 0 {
 									//fmt.Println(fund_file_info2)
 									fund_file_info2.Const += 1
-									models.DB.Where(&fund_file_info).Updates(&fund_file_info2)
+									models.DB.Where("ID=?", fund_file_info.ID).Updates(&fund_file_info2)
 								} else {
 									fund_file_info.Path = dst
 									models.DB.Create(&fund_file_info) // 传入指针

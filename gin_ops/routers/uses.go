@@ -1,7 +1,6 @@
 package routers
 
 import (
-	"fmt"
 	"saas/models"
 	"time"
 
@@ -13,7 +12,7 @@ func Use_login_from_cookie(ctx *gin.Context) {
 	//先从缓存获取cookie值
 	cookie_value, is_have_cookie := ctx.Get("cookie_value")
 	if is_have_cookie {
-		fmt.Println(cookie_value)
+		//fmt.Println(cookie_value)
 
 		var cookie models.Cookie
 		cookie.Value = cookie_value.(string)

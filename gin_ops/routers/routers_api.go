@@ -1,8 +1,6 @@
 package routers
 
 import (
-	"fmt"
-
 	"github.com/gin-gonic/gin"
 	"github.com/mitchellh/mapstructure"
 )
@@ -24,7 +22,7 @@ func Router_api(r *gin.RouterGroup) {
 			}
 
 			if jsonData["data"] != nil {
-				fmt.Println(jsonData["data"])
+				//fmt.Println(jsonData["data"])
 				var data_t map[string]interface{}
 				if err = mapstructure.Decode(jsonData["data"], &data_t); err == nil {
 					ctx.Set("data", &data_t)
