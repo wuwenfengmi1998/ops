@@ -191,7 +191,7 @@ func Router_def(r *gin.RouterGroup) {
 				"user_info": user_info,
 			})
 		} else {
-			ctx.HTML(404, "error_404.html", gin.H{})
+			ctx.Redirect(302, "/sign-in")
 		}
 
 	})
@@ -208,7 +208,25 @@ func Router_def(r *gin.RouterGroup) {
 				"user":      user,
 			})
 		} else {
-			ctx.HTML(404, "error_404.html", gin.H{})
+			ctx.Redirect(302, "/sign-in")
+		}
+
+	})
+
+	r.GET("/chats", func(ctx *gin.Context) {
+
+		user_info, is_login := ctx.Get("user_info")
+		user, _ := ctx.Get("user")
+		//判断是否登录
+		if is_login {
+
+			ctx.HTML(http.StatusOK, "chats.html", gin.H{
+				"is_login":  is_login,
+				"user_info": user_info,
+				"user":      user,
+			})
+		} else {
+			ctx.Redirect(302, "/sign-in")
 		}
 
 	})

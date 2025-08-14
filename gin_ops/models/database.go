@@ -148,6 +148,18 @@ type Ticket struct {
 	CommentCount uint      `gorm:"not null;default:0" json:"commentCount"`                       // 评论数量
 }
 
+type Msgs struct {
+	ID        uint      `gorm:"primaryKey;autoIncrement" json:"id"`                           // 自增ID
+	Text      string    `gorm:"type:text;not null" json:"text"`                               // 消息内容
+	Type      string    `gorm:"type:varchar(16);not null;default:'normal'" json:"type"`       // 消息类型 文字 图片 视频
+	CreatedAt time.Time `gorm:"autoCreateTime;index;not null;" json:"createdAt"`              // 创建日期
+	UpdatedAt time.Time `gorm:"autoCreateTime;index;not null;" json:"updatedAt"`              // 最后更新时间
+	UserID    uint      `gorm:"index;not null" json:"userId"`                                 // 创建用户ID
+	Status    string    `gorm:"type:varchar(16);index;not null;default:'open'" json:"status"` // 最后状态 未读 已读 已撤回
+	ToID      uint      `gorm:"null" json:"toId"`                                             // 接收消息id
+
+}
+
 func init() {
 
 }
@@ -202,5 +214,7 @@ func Init_database() {
 	DB.AutoMigrate(&Ticket{})
 
 	DB.AutoMigrate(&File_info{})
+
+	DB.AutoMigrate(&Msgs{})
 
 }
